@@ -1,0 +1,15 @@
+@startuml ClassDiagram
+class Token {
+  - property_id: uuid
+  - issue_tokens(): void
+}
+
+class User {
+  + name: string
+  + email: string
+  - password: string
+  + has: Token
+}
+
+Token "many" --o "1" User: has >
+@enduml
