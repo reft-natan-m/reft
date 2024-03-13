@@ -1,0 +1,92 @@
+@startuml
+
+package "Database" {
+  
+  entity "User" {
+    + id: int
+    + username: string
+    + email: string
+    + password: string
+    + wallet_address: string
+    --
+    + register(): void
+    + login(email: string, password: string): boolean
+    + updateProfile(username: string, email: string, password: string): void
+    + linkWallet(wallet_address: string): void
+    + getKYCStatus(): boolean
+  }
+  
+  entity "Property" {
+    + id: int
+    + address: string
+    + description: string
+    + images: string
+    --
+    + addProperty(address: string, description: string, images: string): void
+    + editProperty(id: int, address: string, description: string, images: string): void
+    + deleteProperty(id: int): void
+  }
+  
+  entity "Token" {
+    + id: int
+    + property_id: int
+    + owner_id: int
+    + customization_proposed: boolean
+    + customization_approved: boolean
+    + price: float
+    --
+    + tokenizeProperty(property_id: int, owner_id: int): void
+    + customizeToken(token_id: int, customization_data: object): void
+    + approveCustomization(token_id: int): void
+    + transferOwnership(token_id: int, new_owner_id: int): void
+    + setPrice(token_id: int, price: float): void
+  }
+  
+  entity "Transaction" {
+    + id: int
+    + token_id: int
+    + buyer_id: int
+    + seller_id: int
+    + amount: float
+    + payment_method: string
+    + timestamp: datetime
+    --
+    + initiateTransaction(token_id: int, buyer_id: int, seller_id: int, amount: float, payment_method: string): void
+    + verifyTransaction(transaction_id: int): void
+  }
+  
+  entity "KYC" {
+    + id: int
+    + user_id: int
+    + document_type: string
+    + document_image: string
+    + verified: boolean
+    --
+    + submitKYCDocuments(user_id: int, document_type: string, document_image: string): void
+    + verifyKYC(user_id: int): void
+  }
+  
+  entity "Marketplace" {
+    + id: int
+    + token_id: int
+    + price: float
+    + status: string
+    + listed_date: datetime
+    + expiration_date: datetime
+    --
+    + listToken(token_id: int, price: float, expiration_date: datetime): void
+    + updateTokenPrice(token_id: int, new_price: float): void
+    + removeTokenListing(token_id: int): void
+  }
+  
+  User --> Token : owns
+  Property --> Token : represents
+  User --> KYC : has
+  KYC --> User : verified
+  User --> Transaction : initiates
+  Token --> Marketplace : listed_in
+  Token --> Transaction : traded_in
+  
+}
+
+@enduml
