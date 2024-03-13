@@ -34,12 +34,28 @@ class Token {
     - get_token_issuers(): void
 }
 
+class MetaMaskWallet {
+ + name: string
+ - wallet_address: string
+ - transaction_history: List<Transaction>
+ - token_amt: integer
+ - activity_log: List<activity>
+ + add_transaction(Transaction): void
+ + add_token(token): void
+ + update_account_preferences(): void
+ + get_balance(token_amt): double
+}
+
+
 class User {
     + name: string
     + email: string
     - password: string
     + has: Token
+    - has: MetaMaskWallet
 }
 
 Token "many" --o "1" User: has >
+MetaMaskWallet "1" --o  "1" User: connects >
+Token "many" --o "1" MetaMaskWallet: connects >
 @enduml
