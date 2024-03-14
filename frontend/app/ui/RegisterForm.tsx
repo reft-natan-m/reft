@@ -7,6 +7,7 @@ interface FormData {
   name: string;
   email: string;
   password: string;
+  activated: Boolean;
 }
 
 const RegisterForm = () => {
@@ -15,6 +16,7 @@ const RegisterForm = () => {
     name: "",
     email: "",
     password: "",
+    activated: false,
   });
 
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -32,22 +34,21 @@ const RegisterForm = () => {
     setErrorMessage("");
     console.log("data: ", formData);
 
-    // not implemented yet
-    // const res = await fetch("/api/Users", {
-    //   method: "POST",
-    //   body: JSON.stringify({ formData }),
-    //   "content-type": "application/json",
-    // });
-    // if (!res.ok) {
-    //     const response = await res.json();
-    //     setErrorMessage(response.message);
-    //   } else {
-    //     router.refresh();
-    //     router.push("/EmailVerification");
-    //   }
+    const res = await fetch("/api/Users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
 
-    //will be removed after implementation
-    router.push("/EmailVerification");
+    if (!res.ok) {
+      const response = await res.json();
+      setErrorMessage(response.message);
+    } else {
+      router.refresh();
+      router.push("/EmailVerification");
+    }
   };
 
   return (
@@ -103,7 +104,7 @@ const RegisterForm = () => {
               Forgot Password
             </a>
             <span className="mx-2 text-gray-300">/</span>
-            <a className="text-secondary hover:text-blue-500" href="#">
+            <a className="text-secondary hover:text-blue-500" href="/Register">
               Sign Up
             </a>
           </div>

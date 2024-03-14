@@ -1,12 +1,13 @@
 import "@/app/ui/globals.css";
 import { inter } from "./ui/fonts";
 import Nav from "./ui/Nav";
+import React from "react";
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className={inter.className}>
