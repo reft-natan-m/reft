@@ -1,5 +1,4 @@
 @startuml
-
 package "Database" {
   
   entity "User" {
@@ -8,6 +7,8 @@ package "Database" {
     + email: string
     + password: string
     + wallet_address: string
+    + timestamp: datetime
+    + activated: boolean
     --
     + register(): void
     + login(email: string, password: string): boolean
@@ -28,9 +29,7 @@ package "Database" {
   }
   
   entity "Token" {
-    + id: int
-    + property_id: int
-    + owner_id: int
+    + property_id: uuid
     + customization_proposed: boolean
     + customization_approved: boolean
     + price: float
@@ -40,6 +39,15 @@ package "Database" {
     + approveCustomization(token_id: int): void
     + transferOwnership(token_id: int, new_owner_id: int): void
     + setPrice(token_id: int, price: float): void
+    + getPrice(): void
+    + transfer_tokens(): void
+    + burn_tokens(): void
+    + mint_fungible_tokens(): void
+    + get_token_supply(): void
+    + get_token_owner(): void
+    + get_token_transactions(): void
+    + get_token_holders(): void
+    + get_token_issuers(): void
   }
   
   entity "Transaction" {
@@ -79,6 +87,17 @@ package "Database" {
     + removeTokenListing(token_id: int): void
   }
   
+  entity "Activate Token" {
+    + token: string
+    + user: string
+    + activatedAt: datetime
+    + createdAt: datetime
+    + updatedAt: datetime
+    --
+    + activateToken(token: string, user: string): void
+    + verifyActivation(token: string, user: string): void
+  }
+  
   User --> Token : owns
   Property --> Token : represents
   User --> KYC : has
@@ -86,7 +105,9 @@ package "Database" {
   User --> Transaction : initiates
   Token --> Marketplace : listed_in
   Token --> Transaction : traded_in
-  
-}
+  "Activate Token"--> Token : activates
+  "Activate Token" --> User : belongs_to
+  User --> "Activate Token" : has
 
+}
 @enduml
