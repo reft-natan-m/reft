@@ -9,6 +9,7 @@ const userSchema = new Schema(
     email: String,
     password: String,
     activated: Boolean,
+    role: String,
   },
   {
     timestamps: true,

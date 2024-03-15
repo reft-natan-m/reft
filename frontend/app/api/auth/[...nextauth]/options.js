@@ -55,4 +55,14 @@ export const options = {
       return session;
     },
   },
+  // pages: {
+  //   signIn: "/auth/signin",
+  //   verifyRequest: "/auth/verify-request",
+  // },
+  // theme: {
+  //   colorScheme: "dark", // "auto" | "dark" | "light"
+  //   brandColor: "", // Hex color code
+  //   logo: "", // Absolute URL to image
+  //   buttonText: "", // Hex color code
+  // },
 };

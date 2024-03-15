@@ -8,6 +8,7 @@ interface FormData {
   email: string;
   password: string;
   activated: Boolean;
+  role: string;
 }
 
 const RegisterForm = () => {
@@ -17,6 +18,7 @@ const RegisterForm = () => {
     email: "",
     password: "",
     activated: false,
+    role: "user",
   });
 
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -32,7 +34,6 @@ const RegisterForm = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrorMessage("");
-    console.log("data: ", formData);
 
     const res = await fetch("/api/Users", {
       method: "POST",
@@ -47,7 +48,7 @@ const RegisterForm = () => {
       setErrorMessage(response.message);
     } else {
       router.refresh();
-      router.push("/EmailVerification");
+      router.push("/Email/Verification");
     }
   };
 
@@ -101,11 +102,7 @@ const RegisterForm = () => {
           />
           <div className="flex mt-6 justify-center text-xs">
             <a className="text-secondary hover:text-blue-500" href="#">
-              Forgot Password
-            </a>
-            <span className="mx-2 text-gray-300">/</span>
-            <a className="text-secondary hover:text-blue-500" href="/Register">
-              Sign Up
+              Forgot Password?
             </a>
           </div>
         </form>

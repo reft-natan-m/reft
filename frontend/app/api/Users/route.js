@@ -6,7 +6,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
     console.log(body);
-    const userData = body.formData;
+    const userData = body;
 
     //Confirm data exists
     if (!userData || !userData.email || !userData.password) {
@@ -22,17 +22,16 @@ export async function POST(req) {
       .exec();
 
     if (duplicate) {
-      console.log("duplicate");
       return NextResponse.json({ message: "Duplicate Email" }, { status: 409 });
     }
 
     const hashPassword = await bcrypt.hash(userData.password, 13);
     userData.password = hashPassword;
-
+    console.log(userData);
     await User.create(userData);
     return NextResponse.json({ message: "User Created" }, { status: 201 });
   } catch (error) {
-    console.log(err);
-    return NextResponse.json({ message: "Error", err }, { status: 500 });
+    console.log(error);
+    return NextResponse.json({ message: "Error", error }, { status: 500 });
   }
 }
