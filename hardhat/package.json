@@ -7,5 +7,9 @@
     "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "hardhat": "^2.21.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "openzeppelin-solidity": "^3.4.2"
   }
 }
