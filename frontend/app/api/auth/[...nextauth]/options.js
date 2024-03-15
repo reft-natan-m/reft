@@ -34,7 +34,6 @@ export const options = {
             if (match) {
               console.log("Good Pass");
               delete foundUser.password;
-              foundUser["role"] = "Unverified Email";
               return foundUser;
             }
           }
