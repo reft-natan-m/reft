@@ -1,22 +1,38 @@
-import Link from "next/link";
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarCollapse,
+  NavbarLink,
+  NavbarToggle,
+} from "flowbite-react";
+import ThemeSwitch from "./ThemeSwitch";
+import UserDropdown from "./UserDropdown";
 
-const Nav = () => {
+function Nav() {
   return (
-    <nav className="flex justify-between bg-nav p-4">
-      <div className="flex items-center space-x-4">
-        <Link href="/">
-          <p className="text-default-text">Home</p>
-        </Link>
-        <Link href="/Tokenize">
-          <p className="text-default-text">Tokenize</p>
-        </Link>
+    <Navbar fluid rounded>
+      <NavbarBrand href="/">
+        <img src="/images/Dunno.jpg" className="mr-3 h-6 sm:h-9" alt="LOGO" />
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+          REFT
+        </span>
+        <ThemeSwitch />
+      </NavbarBrand>
+      <div className="flex md:order-2">
+        <UserDropdown />
+        <NavbarToggle />
       </div>
-      <div className="flex items-center space-x-4">
-        <p className="text-default-text">Login</p>
-        <p className="text-default-text">Logout</p>
-      </div>
-    </nav>
+      <NavbarCollapse>
+        <NavbarLink href="#" active>
+          Home
+        </NavbarLink>
+        <NavbarLink href="#">Thing 1</NavbarLink>
+        <NavbarLink href="#">Thing 2</NavbarLink>
+        <NavbarLink href="#">Thing 3</NavbarLink>
+        <NavbarLink href="#">Thing 4</NavbarLink>
+      </NavbarCollapse>
+    </Navbar>
   );
-};
+}
 
 export default Nav;
