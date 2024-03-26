@@ -26,10 +26,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/(models)/User.js",
-    "app/api/auth/[...nextauth]/options.ts",
-    "app/api/auth/[...nextauth]/route.js",
-    "app/api/Users/route.js"
+    "app/(models)/User.ts",
+    "app/api/auth/[...nextauth]/[...nextauth].ts",
+    "app/api/auth/[...nextauth]/route.ts",
+    "app/api/Users/route.ts"
   ],
   "exclude": ["node_modules"]
 }

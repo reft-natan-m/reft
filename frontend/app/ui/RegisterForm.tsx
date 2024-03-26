@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 
-interface FormData {
+export interface RegisterFormData {
   name: string;
   email: string;
   password: string;
@@ -13,7 +13,7 @@ interface FormData {
 
 const RegisterForm = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<RegisterFormData>({
     name: "",
     email: "",
     password: "",
