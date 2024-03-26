@@ -23,10 +23,12 @@ export const authOptions: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "username" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(
-        credentials: Record<string, Credentials>,
-        req: NextApiRequest
-      ) {
+      async authorize(credentials, req) {
+        const { username, password } = credentials as {
+          username: string;
+          password: string;
+        };
+
         const res = await fetch("/your/endpoint", {
           method: "POST",
           body: JSON.stringify(credentials),
