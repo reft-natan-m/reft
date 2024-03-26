@@ -1,14 +1,26 @@
 @startuml
+/'
+To run this diagram, you can use the following URL:
+http://www.plantuml.com/plantuml/uml/
+
+In VS Code, you can use the PlantUML extension to preview the diagram.
+https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml
+Be sure to set your settings to use the plantuml server to render and add the main uml server link
+
+class diagram guidelines:
+https://plantuml.com/class-diagram
+'/
+
 package "Database" {
   
   entity "User" {
     + id: int
-    + username: string
+    + name: string
     + email: string
-    + password: string
     + wallet_address: string
     + timestamp: datetime
     + activated: boolean
+    - password: string
     --
     + register(): void
     + login(email: string, password: string): boolean
@@ -33,6 +45,7 @@ package "Database" {
     + customization_proposed: boolean
     + customization_approved: boolean
     + price: float
+    - token_amount: integer
     --
     + tokenizeProperty(property_id: int, owner_id: int): void
     + customizeToken(token_id: int, customization_data: object): void
@@ -97,8 +110,23 @@ package "Database" {
     + activateToken(token: string, user: string): void
     + verifyActivation(token: string, user: string): void
   }
+
+  entity "MetaMaskWallet" {
+     + name: string
+     - wallet_address: string
+     - transaction_history: List<Transaction>
+     - token_amt: integer
+     - activity_log: List<activity>
+     --
+     + add_transaction(Transaction): void
+     + add_token(token): void
+     + update_account_preferences(): void
+     + get_balance(token_amt): double
+  }
   
   User --> Token : owns
+  User --> MetaMaskWallet : has
+  MetaMaskWallet --> Token : has
   Property --> Token : represents
   User --> KYC : has
   KYC --> User : verified
