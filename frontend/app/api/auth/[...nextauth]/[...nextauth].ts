@@ -1,19 +1,6 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { NextApiRequest } from "next";
-
-export interface Credentials {
-  username: {
-    label: string;
-    type: string;
-    placeholder: string;
-  };
-  password: {
-    label: string;
-    type: string;
-  };
-}
 
 export const authOptions: NextAuthOptions = {
   providers: [
