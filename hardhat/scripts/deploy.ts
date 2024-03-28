@@ -1,47 +1,51 @@
 import { ethers } from "hardhat";
 
-async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
-
-  const lockedAmount = ethers.parseEther("0.001");
-
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
-
 //? below is from the hardhat tutorial
 //? https://hardhat.org/tutorial/deploying-to-a-live-network.html
 //? they recommend deploying to a live network testnet called sepolia
-// async function main() {
-//   const [deployer] = await ethers.getSigners();
+async function main() {
+  const signers = await ethers.getSigners();
 
-//   console.log("Deploying contracts with the account:", deployer.address);
+  // get signer addresses and balances
+  for (let i = 0; i < signers.length; i++) {
+    const signer = signers[i];
+    console.log("signer", i + 1, "address:", signer.address);
+    console.log(
+      "signer",
+      i + 1,
+      "balance:",
+      (await signer.getBalance()).toString()
+    );
+  }
 
-//   const token = await ethers.deployContract("Token");
+  const deployer = signers[0];
 
-//   console.log("Token address:", await token.getAddress());
-// }
+  console.log("Deploying contracts with the account:", deployer.address);
 
-// main()
-//   .then(() => process.exit(0))
-//   .catch((error) => {
-//     console.error(error);
-//     process.exit(1);
-//   });
+  const token = await ethers.deployContract("RealEstateFungibleToken");
+
+  console.log("Token address:", await token.address);
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+
+// const realEstateFungibleTokenContract = await ethers.getContractFactory(
+//   "RealEstateFungibleToken"
+// );
+// const reft = await realEstateFungibleTokenContract.attach(
+//   "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+// );
+// await reft.mint(
+//   "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+//   1,
+//   100,
+//   30,
+//   "uri"
+// );
+// await reft.listTokenForSale(1, 1, 10);
+await reft.buyTokens(1);
