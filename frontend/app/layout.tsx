@@ -3,11 +3,11 @@ import { inter } from "./ui/fonts";
 import Nav from "./ui/Nav";
 import { Providers } from "./providers";
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
