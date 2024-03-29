@@ -103,6 +103,24 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         safeTransferFrom(msg.sender, address(this), propertyId, amount, "");
     }
 
+    // function delistTokenForSale(uint256 saleId) public {
+    //     TokenSale memory sale = tokensForSale[saleId];
+    //     require(sale.amount > 0, "Sale does not exist");
+    //     require(sale.seller == msg.sender, "Not the seller");
+
+    //     // Transfer tokens back to seller
+    //     safeTransferFrom(
+    //         address(this),
+    //         msg.sender,
+    //         sale.propertyId,
+    //         sale.amount,
+    //         ""
+    //     );
+
+    //     // Clear the sale
+    //     delete tokensForSale[saleId];
+    // }
+
     // Function to buy tokens
     function buyTokens(uint256 saleId) public payable nonReentrant {
         TokenSale memory sale = tokensForSale[saleId];
@@ -133,24 +151,6 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         // Clear the sale
         delete tokensForSale[saleId];
     }
-
-    // /**
-    //  * @dev Function to facilitate the purchase of tokens from one address to another. This function could
-    //  * be integrated with a marketplace mechanism with added checks for compliance and fraud prevention.
-    //  * @param from The address selling the tokens.
-    //  * @param to The address buying the tokens.
-    //  * @param id The property ID of the tokens being bought.
-    //  * @param amount The amount of tokens to be transferred.
-    //  */
-    // function buyTokens(
-    //     address from,
-    //     address to,
-    //     uint256 id,
-    //     uint256 amount
-    // ) public {
-    //     safeTransferFrom(from, to, id, amount, "");
-    //     emit TokensBought(id, from, to, amount);
-    // }
 
     /**
      * @dev Override the uri function to return the metadata URI for a given property.
