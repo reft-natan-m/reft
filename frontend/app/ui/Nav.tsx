@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { options } from "../api/auth/[...nextauth]/[...nextauth]";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const Nav = async () => {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   return (
     <header className="font-bold bg-nav text-default-text">
