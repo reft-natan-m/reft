@@ -1,31 +1,63 @@
+"use client";
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarCollapse,
+  NavbarLink,
+  NavbarToggle,
+} from "flowbite-react";
+import { useState } from "react";
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]";
+import Button from "./Button";
+import UserDropdown from "./UserDropdown";
 
-const Nav = async () => {
-  const session = await getServerSession(authOptions);
+function Nav() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
 
   return (
-    <header className="font-bold bg-nav text-default-text">
-      <nav className="flex justify-between items-center w-full px-10 py-4">
-        <div className="flex justify-start gap-10">
-          <div>The REFT Bois</div>
-          <Link href="/">Home</Link>
-          <Link href="/Tokenize">Tokenize</Link>
-        </div>
-        <div className="text-decoration-line: underline flex gap-10">
-          {session ? (
-            <Link href="/api/auth/signout?callbackUrl=/">Logout</Link>
-          ) : (
-            <div className="flex gap-10">
-              <Link href="/api/auth/signin">Login</Link>
-              <Link href="/Register">Sign up</Link>
+    <Navbar fluid rounded>
+      <NavbarBrand href="/">
+        <img src="/images/Dunno.jpg" className="mr-3 h-6 sm:h-9" alt="LOGO" />
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+          REFT
+        </span>
+      </NavbarBrand>
+      <div className="flex md:order-2">
+        {isLoggedIn ? (
+          <div>
+            <UserDropdown />
+          </div>
+        ) : (
+          <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
+            <div className="flex py-2 px-3 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+              <Link href="/auth/signin" onClick={handleLogin}>
+                Sign in
+              </Link>
             </div>
-          )}
-        </div>
-      </nav>
-    </header>
+            <div className="ml-4">
+              <Button href="/auth/signup" text="Signup" />
+            </div>
+          </div>
+        )}
+        <NavbarToggle />
+      </div>
+      <NavbarCollapse>
+        <NavbarLink href="#">Thing 1</NavbarLink>
+        <NavbarLink href="#">Thing 2</NavbarLink>
+        <NavbarLink href="#">Thing 3</NavbarLink>
+        <NavbarLink href="#">Thing 4</NavbarLink>
+        <NavbarLink href="#">Thing 5</NavbarLink>
+      </NavbarCollapse>
+    </Navbar>
   );
-};
+}
 
 export default Nav;
