@@ -17,7 +17,7 @@ function UserSidebar() {
       <Sidebar.Items>
         <Sidebar.ItemGroup>
           <Sidebar.Item href="#" icon={HiShieldExclamation}>
-            Change Email & Password
+            Change Email
           </Sidebar.Item>
           <Sidebar.Item href="#" icon={HiUser}>
             Change Avatar Picture
