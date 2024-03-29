@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 interface FormData {
   email: string;
@@ -29,17 +30,15 @@ function SigninForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrorMessage("");
+    signIn("credentials", { ...formData, redirect: false });
 
-    //temporary until backend authentication is implemented
     router.refresh();
     router.push("/");
-
-    //GET function goes here, or w/e next-auth needs for sign in
   };
 
   return (
     <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
-      <form className="space-y-6" onSubmit={handleSubmit} method="get">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <h5 className="text-xl font-medium text-gray-900 dark:text-white">
           Sign in to our platform
         </h5>
