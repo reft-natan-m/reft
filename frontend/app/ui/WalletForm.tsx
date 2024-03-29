@@ -316,42 +316,50 @@ function WalletForm() {
                 tokenization features and participating in the tokenization
                 process of your property. Here's why it's necessary:
               </p>
-              <List ordered>
-                <List.Item>
-                  Ownership Verification: <br /> By connecting your MetaMask
-                  wallet, we can verify your ownership of the property securely
-                  on the blockchain. This ensures that only legitimate property
-                  owners can tokenize their properties.
-                </List.Item>
-                <List.Item>
-                  Token Management: <br />
-                  Your MetaMask wallet serves as your gateway to managing and
-                  interacting with the tokens representing your property
-                  ownership. It allows you to view, transfer, and trade your
-                  property tokens seamlessly.
-                </List.Item>
-                <List.Item>
-                  Security: <br />
-                  MetaMask provides a secure and decentralized environment for
-                  managing digital assets. It uses cryptographic principles to
-                  protect your private keys and transactions, reducing the risk
-                  of unauthorized access or fraud.
-                </List.Item>
-                <List.Item>
-                  Smart Contract Interactions: <br />
-                  Our tokenization process relies on smart contracts deployed on
-                  the blockchain. By connecting your MetaMask wallet, you can
-                  interact with these smart contracts to execute tokenization
-                  transactions securely and transparently.
-                </List.Item>
-                <List.Item>
-                  User Control: <br />
-                  Connecting your MetaMask wallet gives you full control over
-                  your property tokens and associated transactions. You can
-                  monitor activity, approve token transfers, and maintain
-                  ownership rights directly from your wallet interface.
-                </List.Item>
-              </List>
+              <h5 className="mb-3 text-base font-semibold text-gray-900 md:text-xl dark:text-white">
+                1. Ownership Verification:
+              </h5>
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Connecting your MetaMask wallet is essential for accessing our
+                tokenization features and participating in the tokenization
+                process of your property. Here's why it's necessary:
+              </p>
+              <h5 className="mb-3 text-base font-semibold text-gray-900 md:text-xl dark:text-white">
+                2. Token Management:
+              </h5>
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Your MetaMask wallet serves as your gateway to managing and
+                interacting with the tokens representing your property
+                ownership. It allows you to view, transfer, and trade your
+                property tokens seamlessly.
+              </p>
+              <h5 className="mb-3 text-base font-semibold text-gray-900 md:text-xl dark:text-white">
+                3. Security:
+              </h5>
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                MetaMask provides a secure and decentralized environment for
+                managing digital assets. It uses cryptographic principles to
+                protect your private keys and transactions, reducing the risk of
+                unauthorized access or fraud.
+              </p>
+              <h5 className="mb-3 text-base font-semibold text-gray-900 md:text-xl dark:text-white">
+                4. Smart Contract Interactions:
+              </h5>
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Our tokenization process relies on smart contracts deployed on
+                the blockchain. By connecting your MetaMask wallet, you can
+                interact with these smart contracts to execute tokenization
+                transactions securely and transparently.
+              </p>
+              <h5 className="mb-3 text-base font-semibold text-gray-900 md:text-xl dark:text-white">
+                5. User Control:
+              </h5>
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Connecting your MetaMask wallet gives you full control over your
+                property tokens and associated transactions. You can monitor
+                activity, approve token transfers, and maintain ownership rights
+                directly from your wallet interface.
+              </p>
               <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                 In summary, connecting your MetaMask wallet is crucial for
                 facilitating a smooth and secure tokenization experience,
