@@ -81,7 +81,11 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         emit PropertyTokenized(propertyId, to, amount);
     }
 
-    // Function to allow a user to list their tokens for sale
+    /** @dev Function to allow a user to list their tokens for sale, transferring them to the contract for escrow.
+     *  @param saleId The sale ID.
+     * @param propertyId The property ID.
+     * @param amount The amount of tokens to list for sale.
+     */
     function listTokenForSale(
         uint256 saleId,
         uint256 propertyId,
@@ -103,23 +107,28 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         safeTransferFrom(msg.sender, address(this), propertyId, amount, "");
     }
 
-    // function delistTokenForSale(uint256 saleId) public {
-    //     TokenSale memory sale = tokensForSale[saleId];
-    //     require(sale.amount > 0, "Sale does not exist");
-    //     require(sale.seller == msg.sender, "Not the seller");
+    /**
+     * @dev Function to delist tokens for sale. Returns tokens to the seller.
+     * @param saleId The sale ID.
+     */
+    function delistTokenForSale(uint256 saleId) public {
+        TokenSale memory sale = tokensForSale[saleId];
+        require(sale.amount > 0, "Sale does not exist");
+        require(sale.seller == msg.sender, "Not the seller");
 
-    //     // Transfer tokens back to seller
-    //     safeTransferFrom(
-    //         address(this),
-    //         msg.sender,
-    //         sale.propertyId,
-    //         sale.amount,
-    //         ""
-    //     );
+        // Transfer tokens back to seller
+        // ! must use this. to call the function from the contract, otherwise the function will be called by the msg.sender
+        this.safeTransferFrom(
+            address(this),
+            msg.sender,
+            sale.propertyId,
+            sale.amount,
+            ""
+        );
 
-    //     // Clear the sale
-    //     delete tokensForSale[saleId];
-    // }
+        // Clear the sale
+        delete tokensForSale[saleId];
+    }
 
     // Function to buy tokens
     function buyTokens(uint256 saleId) public payable nonReentrant {
@@ -142,8 +151,10 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         // Transfer Ether from buyer to seller
         payable(sale.seller).transfer(msg.value);
 
+        console.log("Transfered %s to %s", msg.value, sale.seller);
+
         // Transfer tokens from contract to buyer
-        safeTransferFrom(
+        this.safeTransferFrom(
             address(this),
             msg.sender,
             propertyId,

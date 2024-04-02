@@ -27,7 +27,26 @@ async function main() {
   );
 
   const thirdSingerReftInstance = reft.connect(third);
+  console.log(await third.getBalance());
   await thirdSingerReftInstance.buyTokens(saleId, { value: propertyValue });
+  console.log(await third.getBalance());
+
+  const otherSaleId = 2;
+  await secondSignerReftInstance.listTokenForSale(
+    otherSaleId,
+    propertyId,
+    amountOfTokensToSell
+  );
+
+  console.log(await second.getBalance());
+  console.log(await deployer.getBalance());
+  console.log(await reft.balanceOf(second.address, propertyId));
+
+  console.log(await secondSignerReftInstance.delistTokenForSale(otherSaleId));
+
+  console.log(await second.getBalance());
+  console.log(await deployer.getBalance());
+  console.log(await reft.balanceOf(second.address, propertyId));
 }
 
 main()
