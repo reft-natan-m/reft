@@ -24,16 +24,12 @@ npx hardhat run scripts/deploy.ts
 4. in the console run the following code to interact with the contract
 
     ```javascript
-    const realEstateFungibleTokenContract = await ethers.getContractFactory(
-    "RealEstateFungibleToken"
-    );
-    const reft = await realEstateFungibleTokenContract.attach(
-    "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    );
-    await reft.mint("{Signer to mint tokens for}", {propertyId}, {amount of tokens to mint}, {price per token}, "{metadata uri / url for the property}");
+    const realEstateFungibleTokenContract = await ethers.getContractFactory("RealEstateFungibleToken");
+    const reft = await realEstateFungibleTokenContract.attach("0x5FbDB2315678afecb367f032d93F642f64180aa3");
+    await reft.mint("{Signer to mint tokens for}", {propertyId}, {amount of tokens to mint}, {price per token},"{metadata uri / url for the property}");
     await reft.mint("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", 1, 100, 2, "{metadata uri / url for the property}");
+    await reft.listTokenForSale(1, 1, 1);
     await reft.buyTokens(1);
-    0x5FbDB2315678afecb367f032d93F642f64180aa3
     ```
 
 5. run the following code to get the balance of the first signer
@@ -43,6 +39,5 @@ npx hardhat run scripts/deploy.ts
     "{signer address}"
     );
     await reft.balanceOf("0x70997970C51812dc3A010C7d01b50e0d17dc79C8");
-    0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
     await reft.balanceOf("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266");
     ```

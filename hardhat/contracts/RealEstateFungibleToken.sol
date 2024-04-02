@@ -131,9 +131,12 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         (bool priceOverflow, uint256 price) = property.pricePerToken.tryMul(
             sale.amount
         );
+        console.log("Property ID: %s", propertyId);
+        console.log("Property Price: %s", property.pricePerToken);
+        console.log("priceOverflow", priceOverflow);
         console.log("Price: %s", price);
         console.log("msg.value: %s", msg.value);
-        require(!priceOverflow, "Price overflow.");
+        require(priceOverflow, "Price overflow.");
         require(msg.value >= price, "Insufficient payment");
 
         // Transfer Ether from buyer to seller
