@@ -6,21 +6,13 @@ import {
   NavbarLink,
   NavbarToggle,
 } from "flowbite-react";
-import { useState } from "react";
 import Link from "next/link";
 import Button from "./Button";
 import UserDropdown from "./UserDropdown";
+import { useSession } from "next-auth/react";
 
 function Nav() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
+  const { data: session } = useSession();
 
   return (
     <Navbar fluid rounded>
@@ -31,16 +23,14 @@ function Nav() {
         </span>
       </NavbarBrand>
       <div className="flex md:order-2">
-        {isLoggedIn ? (
+        {session ? (
           <div>
             <UserDropdown />
           </div>
         ) : (
           <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
             <div className="flex py-2 px-3 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
-              <Link href="/auth/signin" onClick={handleLogin}>
-                Sign in
-              </Link>
+              <Link href="/auth/signin">Sign in</Link>
             </div>
             <div className="ml-4">
               <Button href="/auth/signup" text="Signup" />

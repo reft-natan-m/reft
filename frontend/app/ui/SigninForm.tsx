@@ -1,15 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEventHandler } from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { NextPage } from "next";
 
 interface FormData {
   email: string;
   password: string;
 }
 
-function SigninForm() {
+const SigninForm: NextPage = (): JSX.Element => {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -26,20 +28,23 @@ function SigninForm() {
     }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
-    //temporary until backend authentication is implemented
-    router.refresh();
+    const res = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    });
+    console.log(res);
+    // router.refresh();
     router.push("/");
-
-    //GET function goes here, or w/e next-auth needs for sign in
   };
 
   return (
     <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
-      <form className="space-y-6" onSubmit={handleSubmit} method="get">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <h5 className="text-xl font-medium text-gray-900 dark:text-white">
           Sign in to our platform
         </h5>
@@ -111,6 +116,6 @@ function SigninForm() {
       </form>
     </div>
   );
-}
+};
 
 export default SigninForm;

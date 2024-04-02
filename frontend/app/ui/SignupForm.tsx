@@ -5,23 +5,23 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 
 interface FormData {
-  avatar: string;
+  //avatar: string;
   username: string;
   email: string;
   password: string;
-  activated: boolean;
-  role: string;
+  //activated: boolean;
+  //role: string;
 }
 
 function SignupForm() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
-    avatar: "",
+    //avatar: "",
     username: "",
     email: "",
     password: "",
-    activated: false,
-    role: "user",
+    //activated: false,
+    //role: "user",
   });
   const [passwordConfirmation, setPasswordConfirmation] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -49,25 +49,21 @@ function SignupForm() {
       return;
     }
 
-    //temporary until backend authentication is implemented
-    router.refresh();
-    router.push("/auth/verify-request");
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
 
-    // const res = await fetch("/api/Users", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(formData),
-    // });
-
-    // if (!res.ok) {
-    //   const response = await res.json();
-    //   setErrorMessage(response.message);
-    // } else {
-    //   router.refresh();
-    //   router.push("/auth/verify-request");
-    // }
+    if (!res.ok) {
+      const response = await res.json();
+      setErrorMessage(response.message);
+    } else {
+      router.refresh();
+      router.push("/auth/verify-request");
+    }
   };
 
   return (
