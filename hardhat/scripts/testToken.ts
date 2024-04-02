@@ -10,11 +10,20 @@ async function main() {
   const reft = await realEstateFungibleTokenContract.attach(tokenAddress);
 
   const propertyId = 1;
-  const propertyValue = ethers.utils.parseEther("0.00000000001");
+  const propertyValueInEthereum = 1;
+  const propertyValueInWei = ethers.utils.parseEther(
+    propertyValueInEthereum.toString()
+  );
   const tokensToMint = 100;
   const uri = "www.example.com";
 
-  await reft.mint(second.address, propertyId, tokensToMint, propertyValue, uri);
+  await reft.mint(
+    second.address,
+    propertyId,
+    tokensToMint,
+    propertyValueInWei,
+    uri
+  );
 
   const saleId = 1;
   const amountOfTokensToSell = 1;
@@ -28,7 +37,9 @@ async function main() {
 
   const thirdSingerReftInstance = reft.connect(third);
   console.log(await third.getBalance());
-  await thirdSingerReftInstance.buyTokens(saleId, { value: propertyValue });
+  await thirdSingerReftInstance.buyTokens(saleId, {
+    value: propertyValueInWei,
+  });
   console.log(await third.getBalance());
 
   const otherSaleId = 2;
