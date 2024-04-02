@@ -4,7 +4,7 @@ const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("RealEstateFungibleToken contract", function () {
   async function deployRealEstateFungibleTokenFixture() {
-    const [owner, addr1, addr2] = await ethers.getSigners();
+    const [owner, second, third, fourth, fifth] = await ethers.getSigners();
     const RealEstateFungibleToken = await ethers.getContractFactory(
       "RealEstateFungibleToken"
     );
@@ -12,7 +12,7 @@ describe("RealEstateFungibleToken contract", function () {
 
     await realEstateFungibleToken.deployed();
 
-    return { realEstateFungibleToken, owner, addr1, addr2 };
+    return { realEstateFungibleToken, owner, second, third, fourth, fifth };
   }
 
   describe("Deployment", function () {
@@ -32,16 +32,16 @@ describe("RealEstateFungibleToken contract", function () {
         deployRealEstateFungibleTokenFixture
       );
       const propertyId = 1;
-      const amount = 1000;
-      const pricePerToken = ethers.utils.parseEther("0.01");
-      const metadataURI = "ipfs://example";
+      const amount = 100;
+      const pricePerTokenInWei = ethers.utils.parseEther("1");
+      const metadataURI = "www.example.com";
 
       await expect(
         realEstateFungibleToken.mint(
           owner.address,
           propertyId,
           amount,
-          pricePerToken,
+          pricePerTokenInWei,
           metadataURI
         )
       )
@@ -51,24 +51,36 @@ describe("RealEstateFungibleToken contract", function () {
       const property = await realEstateFungibleToken.properties(propertyId);
       expect(property.metadataURI).to.equal(metadataURI);
       expect(property.totalTokens).to.equal(amount);
-      expect(property.pricePerToken).to.equal(pricePerToken);
+      expect(property.pricePerTokenInWei).to.equal(pricePerTokenInWei);
     });
 
     it("Should prevent tokenizing a property that's already been tokenized", async function () {
       const { realEstateFungibleToken, owner } = await loadFixture(
         deployRealEstateFungibleTokenFixture
       );
-      const propertyId = 1; // Assuming already used in previous test
-      const amount = 1000;
-      const pricePerToken = ethers.utils.parseEther("0.01");
-      const metadataURI = "ipfs://example";
+      const propertyId = 1;
+      const amount = 100;
+      const pricePerTokenInWei = ethers.utils.parseEther("0.01");
+      const metadataURI = "www.example.com";
 
       await expect(
         realEstateFungibleToken.mint(
           owner.address,
           propertyId,
           amount,
-          pricePerToken,
+          pricePerTokenInWei,
+          metadataURI
+        )
+      )
+        .to.emit(realEstateFungibleToken, "PropertyTokenized")
+        .withArgs(propertyId, owner.address, amount);
+
+      await expect(
+        realEstateFungibleToken.mint(
+          owner.address,
+          propertyId,
+          amount,
+          pricePerTokenInWei,
           metadataURI
         )
       ).to.be.revertedWith("Property already tokenized");
@@ -88,11 +100,13 @@ describe("RealEstateFungibleToken contract", function () {
       const { realEstateFungibleToken, owner } = await loadFixture(
         deployRealEstateFungibleTokenFixture
       );
+
       const propertyId = 1; // Assuming this property was tokenized in an earlier test
       const newMetadataURI = "ipfs://newexample";
+      const property = await realEstateFungibleToken.properties(propertyId);
+      property.metadataURI = "www.old.com";
 
       await realEstateFungibleToken.setMetadataURI(propertyId, newMetadataURI);
-      const property = await realEstateFungibleToken.properties(propertyId);
       expect(property.metadataURI).to.equal(newMetadataURI);
     });
   });

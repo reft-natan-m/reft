@@ -13,27 +13,36 @@ import {IERC1155MetadataURI} from "@openzeppelin/contracts/token/ERC1155/extensi
 contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
     using Math for uint256;
 
-    // Struct to hold property details
+    /**
+     * @notice A struct to hold property details.
+     * @param metadataURI The metadata URI for the property.
+     * @param totalTokens The total number of tokens that have been minted for the property.
+     * @param pricePerTokenInWei The price per token in Wei.
+     */
     struct Property {
         string metadataURI;
         uint256 totalTokens;
-        uint256 pricePerToken;
+        uint256 pricePerTokenInWei;
     }
 
-    // Struct to hold sale information
+    /**
+     * @notice A struct to hold details of a token sale.
+     * @param seller The address of the seller.
+     * @param propertyId The property ID of the token
+     * @param amount The amount of tokens for sale.
+     */
     struct TokenSale {
         address seller;
         uint256 propertyId;
         uint256 amount;
     }
 
-    // Property ID to Property details
+    // propertyId => Property, stores all minted properties
     mapping(uint256 => Property) public properties;
 
-    // Mapping to track tokens for sale
+    // saleId => TokenSale, stores all tokens for sale
     mapping(uint256 => TokenSale) public tokensForSale;
 
-    // Events
     event PropertyTokenized(
         uint256 indexed propertyId,
         address indexed owner,
@@ -45,6 +54,13 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         address indexed to,
         uint256 amount
     );
+    event TokensListed(
+        uint256 indexed saleId,
+        uint256 indexed propertyId,
+        address indexed seller,
+        uint256 amount
+    );
+    event TokensDelisted(uint256 indexed saleId, uint256 indexed propertyId);
 
     constructor() ERC1155("") {}
 
@@ -69,14 +85,18 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         address to,
         uint256 propertyId,
         uint256 amount,
-        uint256 pricePerToken,
+        uint256 pricePerTokenInWei,
         string memory metadataURI
     ) public {
         require(
             properties[propertyId].totalTokens == 0,
-            "Property already tokenized"
+            "Property was previously tokenized."
         );
-        properties[propertyId] = Property(metadataURI, amount, pricePerToken);
+        properties[propertyId] = Property(
+            metadataURI,
+            amount,
+            pricePerTokenInWei
+        );
         _mint(to, propertyId, amount, "");
         emit PropertyTokenized(propertyId, to, amount);
     }
@@ -93,18 +113,19 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
     ) public {
         require(
             balanceOf(msg.sender, propertyId) >= amount,
-            "Insufficient token balance"
+            "Insufficient property token balance."
         );
-        require(tokensForSale[saleId].amount == 0, "Sale ID already used");
+        require(tokensForSale[saleId].amount == 0, "Sale ID already exists.");
         require(
             properties[propertyId].totalTokens > 0,
-            "Property not tokenized"
+            "Property has not been tokenized."
         );
 
         tokensForSale[saleId] = TokenSale(msg.sender, propertyId, amount);
 
-        // Transfer tokens to contract for escrow
         safeTransferFrom(msg.sender, address(this), propertyId, amount, "");
+
+        emit TokensListed(saleId, propertyId, msg.sender, amount);
     }
 
     /**
@@ -113,11 +134,18 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      */
     function delistTokenForSale(uint256 saleId) public {
         TokenSale memory sale = tokensForSale[saleId];
-        require(sale.amount > 0, "Sale does not exist");
-        require(sale.seller == msg.sender, "Not the seller");
+        require(sale.amount > 0, "Sale ID does not exist.");
+        require(sale.seller == msg.sender, "Not the original owner.");
 
-        // Transfer tokens back to seller
-        // ! must use this. to call the function from the contract, otherwise the function will be called by the msg.sender
+        /**
+         * Transfer tokens back to the seller
+         * ! The this. is required to call the ERC1155 safeTransferFrom function
+         * ! This is important because the caller of this function does not have access to transfer
+         * ! tokens now owned by the contract back to themselves
+         *
+         * ! When you call the function through this. it is as if the contract is calling the function
+         * ! and the contract has access to its own tokens so the transfer is successful
+         */
         this.safeTransferFrom(
             address(this),
             msg.sender,
@@ -126,44 +154,53 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             ""
         );
 
-        // Clear the sale
+        // Delete the sale
         delete tokensForSale[saleId];
+
+        emit TokensDelisted(saleId, sale.propertyId);
     }
 
-    // Function to buy tokens
+    /**
+     * @dev Function to buy tokens from a seller.
+     * @param saleId The sale ID.
+     */
     function buyTokens(uint256 saleId) public payable nonReentrant {
         TokenSale memory sale = tokensForSale[saleId];
+        require(sale.amount > 0, "Sale ID does not exist.");
 
-        require(sale.amount > 0, "Sale does not exist");
-        uint256 propertyId = sale.propertyId;
-        Property memory property = properties[propertyId];
-        (bool priceOverflow, uint256 price) = property.pricePerToken.tryMul(
-            sale.amount
-        );
-        console.log("Property ID: %s", propertyId);
-        console.log("Property Price: %s", property.pricePerToken);
-        console.log("priceOverflow", priceOverflow);
-        console.log("Price: %s", price);
-        console.log("msg.value: %s", msg.value);
+        Property memory property = properties[sale.propertyId];
+        (bool priceOverflow, uint256 price) = property
+            .pricePerTokenInWei
+            .tryMul(sale.amount);
         require(priceOverflow, "Price overflow.");
-        require(msg.value >= price, "Insufficient payment");
+
+        require(msg.value >= price, "Insufficient payment.");
 
         // Transfer Ether from buyer to seller
         payable(sale.seller).transfer(msg.value);
 
-        console.log("Transfered %s to %s", msg.value, sale.seller);
-
-        // Transfer tokens from contract to buyer
+        /**
+         * Transfer tokens to the buyer from the contract
+         * ! The this. is required to call the ERC1155 safeTransferFrom function
+         * ! please see the comment in the delistTokenForSale function for more information
+         */
         this.safeTransferFrom(
             address(this),
             msg.sender,
-            propertyId,
+            sale.propertyId,
             sale.amount,
             ""
         );
 
-        // Clear the sale
+        // Delete the sale
         delete tokensForSale[saleId];
+
+        emit TokensBought(
+            sale.propertyId,
+            sale.seller,
+            msg.sender,
+            sale.amount
+        );
     }
 
     /**
@@ -175,7 +212,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
     }
 
     /**
-     * @dev Override the totalSupply function to return the total supply of tokens for a given property.
+     * @dev return the total supply of tokens for a given property.
      * @param id The property ID.
      */
     function totalSupply(uint256 id) public view returns (uint256) {
@@ -188,17 +225,26 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @param metadataURI The new metadata URI.
      */
     function setMetadataURI(uint256 id, string memory metadataURI) public {
-        require(properties[id].totalTokens > 0, "Property not tokenized");
+        require(
+            properties[id].totalTokens > 0,
+            "Property has not been tokenized."
+        );
         properties[id].metadataURI = metadataURI;
     }
 
     /**
      * @dev update the price per token for a given property.
      * @param id The property ID.
-     * @param pricePerToken The new price per token.
+     * @param pricePerTokenInWei The new price per token.
      */
-    function setPricePerToken(uint256 id, uint256 pricePerToken) public {
-        require(properties[id].totalTokens > 0, "Property not tokenized");
-        properties[id].pricePerToken = pricePerToken;
+    function setPricePerTokenInWei(
+        uint256 id,
+        uint256 pricePerTokenInWei
+    ) public {
+        require(
+            properties[id].totalTokens > 0,
+            "Property has not been tokenized."
+        );
+        properties[id].pricePerTokenInWei = pricePerTokenInWei;
     }
 }
