@@ -6,7 +6,7 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
-    "hardhat": "^2.21.0"
+    "hardhat": "^2.22.2"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",
