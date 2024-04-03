@@ -43,7 +43,14 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        return user;
+        const adapterUser = {
+          id: user.id,
+          email: user.email,
+          name: user.username,
+          image: user.avatar,
+        };
+
+        return adapterUser;
       },
     }),
   ],
