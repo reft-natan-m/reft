@@ -66,7 +66,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ERC1155, ERC1155Holder) returns (bool) {
+    ) public view override(ERC1155, ERC1155Holder) returns (bool) {
         return
             interfaceId == type(IERC1155).interfaceId ||
             interfaceId == type(IERC1155MetadataURI).interfaceId ||
@@ -87,7 +87,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         uint256 amount,
         uint256 pricePerTokenInWei,
         string memory metadataURI
-    ) public {
+    ) external {
         require(
             properties[propertyId].totalTokens == 0,
             "Property was previously tokenized."
@@ -110,7 +110,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         uint256 saleId,
         uint256 propertyId,
         uint256 amount
-    ) public {
+    ) external {
         require(
             balanceOf(msg.sender, propertyId) >= amount,
             "Insufficient property token balance."
@@ -132,7 +132,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @dev Function to delist tokens for sale. Returns tokens to the seller.
      * @param saleId The sale ID.
      */
-    function delistTokenForSale(uint256 saleId) public {
+    function delistTokenForSale(uint256 saleId) external {
         TokenSale memory sale = tokensForSale[saleId];
         require(sale.amount > 0, "Sale ID does not exist.");
         require(sale.seller == msg.sender, "Not the original owner.");
@@ -164,7 +164,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @dev Function to buy tokens from a seller.
      * @param saleId The sale ID.
      */
-    function buyTokens(uint256 saleId) public payable nonReentrant {
+    function buyTokens(uint256 saleId) external payable nonReentrant {
         TokenSale memory sale = tokensForSale[saleId];
         require(sale.amount > 0, "Sale ID does not exist.");
 
@@ -215,7 +215,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @dev return the pricePerTokenInWei for a given property.
      * @param id The property ID.
      */
-    function getPricePerTokenInWei(uint256 id) public view returns (uint256) {
+    function getPricePerTokenInWei(uint256 id) external view returns (uint256) {
         return properties[id].pricePerTokenInWei;
     }
 
@@ -223,7 +223,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @dev return the total supply of tokens for a given property.
      * @param id The property ID.
      */
-    function totalSupply(uint256 id) public view returns (uint256) {
+    function totalSupply(uint256 id) external view returns (uint256) {
         return properties[id].totalTokens;
     }
 
@@ -232,7 +232,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @param id The property ID.
      * @param metadataURI The new metadata URI.
      */
-    function setMetadataURI(uint256 id, string memory metadataURI) public {
+    function setMetadataURI(uint256 id, string memory metadataURI) external {
         require(
             properties[id].totalTokens > 0,
             "Property has not been tokenized."
@@ -248,7 +248,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
     function setPricePerTokenInWei(
         uint256 id,
         uint256 pricePerTokenInWei
-    ) public {
+    ) external {
         require(
             properties[id].totalTokens > 0,
             "Property has not been tokenized."
