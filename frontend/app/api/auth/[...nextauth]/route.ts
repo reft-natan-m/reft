@@ -4,7 +4,8 @@ import { PrismaClient } from "@prisma/client";
 import type { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { Adapter } from "next-auth/adapters";
+import { Adapter, AdapterUser } from "next-auth/adapters";
+import { JWT } from "next-auth/jwt";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +44,14 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        return user;
+        const adapterUser = {
+          id: user.id,
+          email: user.email,
+          name: user.username,
+          image: user.avatar,
+        };
+
+        return adapterUser;
       },
     }),
   ],
