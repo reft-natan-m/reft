@@ -15,6 +15,37 @@ describe("RealEstateFungibleToken contract", function () {
     return { realEstateFungibleToken, owner, second, third, fourth, fifth };
   }
 
+  async function tokenizeFixture() {
+    const { realEstateFungibleToken, owner, second, third, fourth, fifth } =
+      await loadFixture(deployRealEstateFungibleTokenFixture);
+
+    const propertyId = 1;
+    const amount = 100;
+    const pricePerTokenInWei = ethers.parseEther("1");
+    const metadataURI = "www.example.com";
+
+    await realEstateFungibleToken.mint(
+      owner.address,
+      propertyId,
+      amount,
+      pricePerTokenInWei,
+      metadataURI
+    );
+
+    return {
+      realEstateFungibleToken,
+      owner,
+      propertyId,
+      amount,
+      pricePerTokenInWei,
+      metadataURI,
+      second,
+      third,
+      fourth,
+      fifth,
+    };
+  }
+
   describe("Deployment", function () {
     it("Should deploy correctly and set the owner", async function () {
       const { realEstateFungibleToken, owner } = await loadFixture(
@@ -55,13 +86,14 @@ describe("RealEstateFungibleToken contract", function () {
     });
 
     it("Should prevent tokenizing a property that's already been tokenized", async function () {
-      const { realEstateFungibleToken, owner } = await loadFixture(
-        deployRealEstateFungibleTokenFixture
-      );
-      const propertyId = 1;
-      const amount = 100;
-      const pricePerTokenInWei = ethers.parseEther("0.01");
-      const metadataURI = "www.example.com";
+      const {
+        realEstateFungibleToken,
+        owner,
+        propertyId,
+        amount,
+        pricePerTokenInWei,
+        metadataURI,
+      } = await loadFixture(tokenizeFixture);
 
       await expect(
         realEstateFungibleToken.mint(
@@ -71,19 +103,7 @@ describe("RealEstateFungibleToken contract", function () {
           pricePerTokenInWei,
           metadataURI
         )
-      )
-        .to.emit(realEstateFungibleToken, "PropertyTokenized")
-        .withArgs(propertyId, owner.address, amount);
-
-      await expect(
-        realEstateFungibleToken.mint(
-          owner.address,
-          propertyId,
-          amount,
-          pricePerTokenInWei,
-          metadataURI
-        )
-      ).to.be.revertedWith("Property already tokenized");
+      ).to.be.revertedWith("Property was previously tokenized.");
     });
   });
 
@@ -97,17 +117,18 @@ describe("RealEstateFungibleToken contract", function () {
 
   describe("Updating Property Details", function () {
     it("Should allow updating the metadata URI of a tokenized property", async function () {
-      const { realEstateFungibleToken, owner } = await loadFixture(
-        deployRealEstateFungibleTokenFixture
-      );
+      const { realEstateFungibleToken, propertyId, metadataURI } =
+        await loadFixture(tokenizeFixture);
 
-      const propertyId = 1; // Assuming this property was tokenized in an earlier test
-      const newMetadataURI = "ipfs://newexample";
+      const newMetadataURI = metadataURI + "/new";
       const property = await realEstateFungibleToken.properties(propertyId);
-      property.metadataURI = "www.old.com";
+      expect(property.metadataURI).to.equal(metadataURI);
 
       await realEstateFungibleToken.setMetadataURI(propertyId, newMetadataURI);
-      expect(property.metadataURI).to.equal(newMetadataURI);
+      const updatedProperty = await realEstateFungibleToken.properties(
+        propertyId
+      );
+      expect(updatedProperty.metadataURI).to.equal(newMetadataURI);
     });
   });
 
