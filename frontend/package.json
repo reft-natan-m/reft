@@ -10,13 +10,15 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.5.1",
+    "@dicebear/collection": "^8.0.0",
+    "@dicebear/core": "^8.0.0",
     "@prisma/client": "^5.11.0",
     "bcrypt": "^5.1.1",
+    "flowbite": "^2.3.0",
+    "flowbite-react": "^0.7.3",
     "mongodb": "^6.5.0",
     "next": "^14.1.1",
     "next-auth": "^4.24.7",
-    "flowbite": "^2.3.0",
-    "flowbite-react": "^0.7.3",
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18"
