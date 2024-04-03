@@ -14,12 +14,15 @@ const UserDropdown: React.FC = () => {
     const fetchData = async () => {
       try {
         const res = await fetch(`/api/user?email=${session?.user?.email}`);
+
         if (!res.ok) {
           throw new Error("Failed to fetch user data");
         }
         const userData = await res.json();
         setAvatarURL(userData.avatar);
+
         setUsername(userData.username);
+
       } catch (error: any) {
         setErrorMessage(error.message);
       }
