@@ -16,28 +16,28 @@ function UserSidebar() {
     <Sidebar aria-label="User Sidebar" className="justify-start">
       <Sidebar.Items>
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="#" icon={HiShieldExclamation}>
+          <Sidebar.Item
+            href="/user/[id]/settings/email"
+            icon={HiShieldExclamation}
+          >
             Change Email
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiUser}>
-            Change Avatar Picture
+          <Sidebar.Item href="/user/[id]/settings/password" icon={HiViewBoards}>
+            Change Password
+          </Sidebar.Item>
+          <Sidebar.Item href="/user/[id]/settings/username" icon={HiUser}>
+            Change Username
           </Sidebar.Item>
         </Sidebar.ItemGroup>
         <Sidebar.ItemGroup>
           <Sidebar.Item href="#" icon={HiInbox}>
-            Inbox
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiUser}>
-            Users
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiShoppingBag}>
-            Products
+            Properties
           </Sidebar.Item>
           <Sidebar.Item href="#" icon={HiArrowSmRight}>
-            Sign In
+            History
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiTable}>
-            Sign Up
+          <Sidebar.Item href="#" icon={HiShoppingBag}>
+            Wallet
           </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>

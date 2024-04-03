@@ -94,7 +94,7 @@ const UserDropdown: React.FC = () => {
             </li>
             <li>
               <Link
-                href="/user/0/settings"
+                href={`/user/${username}/settings/email`}
                 onClick={closeDropdown}
                 className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >
