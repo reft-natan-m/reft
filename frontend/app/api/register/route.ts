@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { username, email, password } = body; // avatar, activated, role
+  const { avatar, username, email, password } = body; // avatar, activated, role
   console.log(body);
 
   if (!username || !email || !password) {
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.create({
     data: {
+      avatar,
       username,
       email,
       hashedPassword,
