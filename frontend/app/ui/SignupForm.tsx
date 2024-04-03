@@ -5,7 +5,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 
 interface FormData {
-  //avatar: string;
+  avatar: string;
   username: string;
   email: string;
   password: string;
@@ -16,7 +16,7 @@ interface FormData {
 function SignupForm() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
-    //avatar: "",
+    avatar: "",
     username: "",
     email: "",
     password: "",
@@ -49,12 +49,17 @@ function SignupForm() {
       return;
     }
 
+    const avatarURL =
+      "https://api.dicebear.com/8.x/identicon/svg?seed=" + formData.username;
+
+    const formDataWithAvatar = { ...formData, avatar: avatarURL };
+
     const res = await fetch("/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(formDataWithAvatar),
     });
 
     if (!res.ok) {

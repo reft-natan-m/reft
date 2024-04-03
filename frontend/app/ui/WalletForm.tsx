@@ -280,7 +280,7 @@ function WalletForm() {
               />
             </svg>
             <span className="flex-1 ms-3 whitespace-nowrap">
-              Create MetaMask Wallet
+              Metamask Test Button
             </span>
           </Link>
         </li>
