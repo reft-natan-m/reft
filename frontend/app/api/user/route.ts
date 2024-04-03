@@ -25,5 +25,11 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  return NextResponse.json(user);
+  return NextResponse.json({
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    emailVerified: user.emailVerified,
+    avatar: user.avatar,
+  });
 }
