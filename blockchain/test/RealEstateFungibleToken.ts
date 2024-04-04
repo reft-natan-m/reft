@@ -5,9 +5,7 @@ import { ethers } from "hardhat";
 describe("RealEstateFungibleToken contract", function () {
   async function deployRealEstateFungibleTokenFixture() {
     const [owner, second, third, fourth, fifth] = await ethers.getSigners();
-    const RealEstateFungibleToken = await ethers.getContractFactory(
-      "RealEstateFungibleToken"
-    );
+    const RealEstateFungibleToken = await ethers.getContractFactory("RealEstateFungibleToken");
     const realEstateFungibleToken = await RealEstateFungibleToken.deploy();
 
     await realEstateFungibleToken.waitForDeployment();
@@ -16,8 +14,9 @@ describe("RealEstateFungibleToken contract", function () {
   }
 
   async function tokenizeFixture() {
-    const { realEstateFungibleToken, owner, second, third, fourth, fifth } =
-      await loadFixture(deployRealEstateFungibleTokenFixture);
+    const { realEstateFungibleToken, owner, second, third, fourth, fifth } = await loadFixture(
+      deployRealEstateFungibleTokenFixture
+    );
 
     const propertyId = 1;
     const amount = 100;
@@ -48,12 +47,8 @@ describe("RealEstateFungibleToken contract", function () {
 
   describe("Deployment", function () {
     it("Should deploy correctly and set the owner", async function () {
-      const { realEstateFungibleToken, owner } = await loadFixture(
-        deployRealEstateFungibleTokenFixture
-      );
-      expect(
-        await realEstateFungibleToken.supportsInterface("0xd9b67a26")
-      ).to.equal(true); // IERC1155
+      const { realEstateFungibleToken } = await loadFixture(deployRealEstateFungibleTokenFixture);
+      expect(await realEstateFungibleToken.supportsInterface("0xd9b67a26")).to.equal(true); // IERC1155
     });
   });
 
@@ -117,17 +112,16 @@ describe("RealEstateFungibleToken contract", function () {
 
   describe("Updating Property Details", function () {
     it("Should allow updating the metadata URI of a tokenized property", async function () {
-      const { realEstateFungibleToken, propertyId, metadataURI } =
-        await loadFixture(tokenizeFixture);
+      const { realEstateFungibleToken, propertyId, metadataURI } = await loadFixture(
+        tokenizeFixture
+      );
 
       const newMetadataURI = metadataURI + "/new";
       const property = await realEstateFungibleToken.properties(propertyId);
       expect(property.metadataURI).to.equal(metadataURI);
 
       await realEstateFungibleToken.setMetadataURI(propertyId, newMetadataURI);
-      const updatedProperty = await realEstateFungibleToken.properties(
-        propertyId
-      );
+      const updatedProperty = await realEstateFungibleToken.properties(propertyId);
       expect(updatedProperty.metadataURI).to.equal(newMetadataURI);
     });
   });
