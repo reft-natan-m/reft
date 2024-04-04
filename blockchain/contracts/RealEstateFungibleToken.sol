@@ -29,12 +29,12 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @notice A struct to hold details of a token sale.
      * @param seller The address of the seller.
      * @param propertyId The property ID of the token
-     * @param amount The amount of tokens for sale.
+     * @param amountOfTokens The amount of tokens for sale.
      */
     struct TokenSale {
         address seller;
         uint256 propertyId;
-        uint256 amount;
+        uint256 amountOfTokens;
     }
 
     // propertyId => Property, stores all minted properties
@@ -52,18 +52,22 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         uint256 indexed propertyId,
         address indexed from,
         address indexed to,
-        uint256 amount
+        uint256 amountOfTokens
     );
     event TokensListed(
         uint256 indexed saleId,
         uint256 indexed propertyId,
         address indexed seller,
-        uint256 amount
+        uint256 amountOfTokens
     );
     event TokensDelisted(uint256 indexed saleId, uint256 indexed propertyId);
 
     constructor() ERC1155("") {}
 
+    /**
+     * @dev Override the supportsInterface function to add support for the IERC1155MetadataURI interface.
+     * @param interfaceId The interface ID.
+     */
     function supportsInterface(
         bytes4 interfaceId
     ) public view override(ERC1155, ERC1155Holder) returns (bool) {
@@ -75,16 +79,52 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
     }
 
     /**
+     * @dev Override the uri function to return the metadata URI for a given property.
+     * @param propertyId The property ID.
+     */
+    function uri(
+        uint256 propertyId
+    ) public view override returns (string memory) {
+        return properties[propertyId].metadataURI;
+    }
+
+    /**
+     * @dev return the pricePerTokenInWei for a given property.
+     * @param propertyId The property id.
+     */
+    function getPricePerTokenInWei(
+        uint256 propertyId
+    ) external view returns (uint256) {
+        return properties[propertyId].pricePerTokenInWei;
+    }
+
+    /**
+     * @dev return the total supply of tokens for a given property.
+     * @param propertyId The property id.
+     */
+    function totalSupply(uint256 propertyId) external view returns (uint256) {
+        return properties[propertyId].totalTokens;
+    }
+
+    /**
+     * @dev return the sale details for a given sale ID.
+     * @param saleId The sale ID.
+     */
+    function getSale(uint256 saleId) external view returns (TokenSale memory) {
+        return tokensForSale[saleId];
+    }
+
+    /**
      * @dev Function to mint tokens for a new property.
      * @param to The address that will receive the tokens.
      * @param propertyId The property ID.
-     * @param amount The amount of tokens to mint.
+     * @param amountOfTokens The amount of tokens to mint.
      * @param metadataURI The metadata URI for the token.
      */
     function mint(
         address to,
         uint256 propertyId,
-        uint256 amount,
+        uint256 amountOfTokens,
         uint256 pricePerTokenInWei,
         string memory metadataURI
     ) external {
@@ -94,38 +134,51 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         );
         properties[propertyId] = Property(
             metadataURI,
-            amount,
+            amountOfTokens,
             pricePerTokenInWei
         );
-        _mint(to, propertyId, amount, "");
-        emit PropertyTokenized(propertyId, to, amount);
+        _mint(to, propertyId, amountOfTokens, "");
+        emit PropertyTokenized(propertyId, to, amountOfTokens);
     }
 
     /** @dev Function to allow a user to list their tokens for sale, transferring them to the contract for escrow.
      *  @param saleId The sale ID.
      * @param propertyId The property ID.
-     * @param amount The amount of tokens to list for sale.
+     * @param amountOfTokens The amount of tokens to list for sale.
      */
     function listTokenForSale(
         uint256 saleId,
         uint256 propertyId,
-        uint256 amount
+        uint256 amountOfTokens
     ) external {
-        require(
-            balanceOf(msg.sender, propertyId) >= amount,
-            "Insufficient property token balance."
-        );
-        require(tokensForSale[saleId].amount == 0, "Sale ID already exists.");
         require(
             properties[propertyId].totalTokens > 0,
             "Property has not been tokenized."
         );
+        require(
+            balanceOf(msg.sender, propertyId) >= amountOfTokens,
+            "Insufficient property token balance."
+        );
+        require(
+            tokensForSale[saleId].amountOfTokens == 0,
+            "Sale ID already exists."
+        );
 
-        tokensForSale[saleId] = TokenSale(msg.sender, propertyId, amount);
+        tokensForSale[saleId] = TokenSale(
+            msg.sender,
+            propertyId,
+            amountOfTokens
+        );
 
-        safeTransferFrom(msg.sender, address(this), propertyId, amount, "");
+        safeTransferFrom(
+            msg.sender,
+            address(this),
+            propertyId,
+            amountOfTokens,
+            ""
+        );
 
-        emit TokensListed(saleId, propertyId, msg.sender, amount);
+        emit TokensListed(saleId, propertyId, msg.sender, amountOfTokens);
     }
 
     /**
@@ -134,7 +187,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      */
     function delistTokenForSale(uint256 saleId) external {
         TokenSale memory sale = tokensForSale[saleId];
-        require(sale.amount > 0, "Sale ID does not exist.");
+        require(sale.amountOfTokens > 0, "Sale ID does not exist.");
         require(sale.seller == msg.sender, "Not the original owner.");
 
         /**
@@ -150,7 +203,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             address(this),
             msg.sender,
             sale.propertyId,
-            sale.amount,
+            sale.amountOfTokens,
             ""
         );
 
@@ -166,15 +219,16 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      */
     function buyTokens(uint256 saleId) external payable nonReentrant {
         TokenSale memory sale = tokensForSale[saleId];
-        require(sale.amount > 0, "Sale ID does not exist.");
+        require(sale.amountOfTokens > 0, "Sale ID does not exist.");
 
         Property memory property = properties[sale.propertyId];
         (bool priceOverflow, uint256 price) = property
             .pricePerTokenInWei
-            .tryMul(sale.amount);
+            .tryMul(sale.amountOfTokens);
         require(priceOverflow, "Price overflow.");
 
         require(msg.value >= price, "Insufficient payment.");
+        require(msg.value <= price, "Excess payment.");
 
         // Transfer Ether from buyer to seller
         payable(sale.seller).transfer(msg.value);
@@ -188,7 +242,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             address(this),
             msg.sender,
             sale.propertyId,
-            sale.amount,
+            sale.amountOfTokens,
             ""
         );
 
@@ -199,60 +253,39 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             sale.propertyId,
             sale.seller,
             msg.sender,
-            sale.amount
+            sale.amountOfTokens
         );
-    }
-
-    /**
-     * @dev Override the uri function to return the metadata URI for a given property.
-     * @param id The property ID.
-     */
-    function uri(uint256 id) public view override returns (string memory) {
-        return properties[id].metadataURI;
-    }
-
-    /**
-     * @dev return the pricePerTokenInWei for a given property.
-     * @param id The property ID.
-     */
-    function getPricePerTokenInWei(uint256 id) external view returns (uint256) {
-        return properties[id].pricePerTokenInWei;
-    }
-
-    /**
-     * @dev return the total supply of tokens for a given property.
-     * @param id The property ID.
-     */
-    function totalSupply(uint256 id) external view returns (uint256) {
-        return properties[id].totalTokens;
     }
 
     /**
      * @dev update the metadata URI for a given property.
-     * @param id The property ID.
+     * @param propertyId The property id.
      * @param metadataURI The new metadata URI.
      */
-    function setMetadataURI(uint256 id, string memory metadataURI) external {
+    function setMetadataURI(
+        uint256 propertyId,
+        string memory metadataURI
+    ) external {
         require(
-            properties[id].totalTokens > 0,
+            properties[propertyId].totalTokens > 0,
             "Property has not been tokenized."
         );
-        properties[id].metadataURI = metadataURI;
+        properties[propertyId].metadataURI = metadataURI;
     }
 
     /**
      * @dev update the price per token for a given property.
-     * @param id The property ID.
+     * @param propertyId The property id.
      * @param pricePerTokenInWei The new price per token.
      */
     function setPricePerTokenInWei(
-        uint256 id,
+        uint256 propertyId,
         uint256 pricePerTokenInWei
     ) external {
         require(
-            properties[id].totalTokens > 0,
+            properties[propertyId].totalTokens > 0,
             "Property has not been tokenized."
         );
-        properties[id].pricePerTokenInWei = pricePerTokenInWei;
+        properties[propertyId].pricePerTokenInWei = pricePerTokenInWei;
     }
 }
