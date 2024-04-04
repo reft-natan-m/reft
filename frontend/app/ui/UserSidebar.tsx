@@ -2,11 +2,11 @@
 
 import { Sidebar } from "flowbite-react";
 import {
-  HiArrowSmRight,
+  HiOfficeBuilding,
   HiShieldExclamation,
-  HiInbox,
-  HiShoppingBag,
-  HiTable,
+  HiCurrencyDollar,
+  HiIdentification,
+  HiBookOpen,
   HiUser,
   HiViewBoards,
 } from "react-icons/hi";
@@ -30,13 +30,16 @@ function UserSidebar() {
           </Sidebar.Item>
         </Sidebar.ItemGroup>
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="#" icon={HiInbox}>
+          <Sidebar.Item href="#" icon={HiOfficeBuilding}>
             Properties
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiArrowSmRight}>
+          <Sidebar.Item href="/property/tokenize" icon={HiCurrencyDollar}>
+            Tokenize
+          </Sidebar.Item>
+          <Sidebar.Item href="#" icon={HiBookOpen}>
             History
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiShoppingBag}>
+          <Sidebar.Item href="#" icon={HiIdentification}>
             Wallet
           </Sidebar.Item>
         </Sidebar.ItemGroup>
