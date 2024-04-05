@@ -1,13 +1,22 @@
-"use client";
-
 import { useState } from "react";
 import { Button, Label, TextInput, Select } from "flowbite-react";
-import Link from "next/link";
 import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi";
 
 interface PropertyFormProps {
-  nextStep: () => void;
   prevStep?: () => void;
+  handleSubmit: (data: FormData) => void;
+}
+
+interface FormData {
+  country: string;
+  state: string;
+  street1: string;
+  street2: string;
+  zip: string;
+  year: number;
+  propType: string;
+  propSubtype: string;
+  size: number;
 }
 
 const usStates = [
@@ -74,29 +83,44 @@ const propertyTypes: { [key: string]: string[] } = {
   Industrial: ["Warehouse", "Manufacturing", "Distribution"],
 };
 
-const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
-  const [selectedState, setSelectedState] = useState<string>("");
-  const [selectedYear, setSelectedYear] = useState<number | "">(
-    new Date().getFullYear()
-  );
+const PropertyForm: React.FC<PropertyFormProps> = ({
+  prevStep,
+  handleSubmit,
+}) => {
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>("");
-  const [selectedSubType, setSelectedSubType] = useState<string>("");
+  const [formData, setFormData] = useState<any>({
+    country: "United States",
+    state: "",
+    street1: "",
+    street2: "",
+    zip: "",
+    year: "",
+    propType: "",
+    propSubtype: "",
+    size: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ): void => {
+    const { name, value } = e.target;
+    setFormData((prevState: any) => ({ ...prevState, [name]: value }));
+  };
 
   const handlePropertyTypeChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const type = e.target.value;
     setSelectedPropertyType(type);
-    setSelectedSubType("");
+    setFormData((prevState: any) => ({ ...prevState, propType: type }));
   };
 
   const handleNext = () => {
-    // Validate form fields here if necessary
-    nextStep();
+    handleSubmit(formData);
   };
 
   return (
-    <form className="flex flex-col gap-4 mt-10">
+    <form className="flex flex-col gap-4 mt-10" onSubmit={handleNext}>
       <div>
         <h5 className="mb-5 text-xl font-medium text-gray-900 dark:text-white">
           Property Address
@@ -104,7 +128,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         <div className="mb-2 block">
           <Label htmlFor="Country" value="Country" />
         </div>
-        <Select id="countries" disabled>
+        <Select id="countries" name="country" disabled>
           <option>United States</option>
         </Select>
       </div>
@@ -114,8 +138,9 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <Select
           id="states"
-          value={selectedState}
-          onChange={(e) => setSelectedState(e.target.value)}
+          name="state"
+          value={formData.state}
+          onChange={handleChange}
           required
           shadow
         >
@@ -133,8 +158,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <TextInput
           id="address1"
+          name="street1"
           type="text"
           placeholder="street address 1"
+          onChange={handleChange}
+          value={formData.street1}
           required
           shadow
         />
@@ -145,8 +173,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <TextInput
           id="address2"
+          name="street2"
           type="text"
           placeholder="street address 2"
+          onChange={handleChange}
+          value={formData.street2}
           shadow
         />
       </div>
@@ -156,8 +187,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <TextInput
           id="zipcode"
-          type="number"
+          name="zip"
+          type="text"
           placeholder="zipcode"
+          onChange={handleChange}
+          value={formData.zip}
           shadow
           required
         />
@@ -171,8 +205,9 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <Select
           id="yearBuilt"
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+          name="year"
+          onChange={handleChange}
+          value={formData.year}
           required
           shadow
         >
@@ -190,7 +225,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <Select
           id="propertyType"
-          value={selectedPropertyType}
+          name="propType"
+          value={formData.propType}
           onChange={handlePropertyTypeChange}
           required
           shadow
@@ -209,8 +245,9 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <Select
           id="subType"
-          value={selectedSubType}
-          onChange={(e) => setSelectedSubType(e.target.value)}
+          name="propSubtype"
+          value={formData.propSubtype}
+          onChange={handleChange}
           disabled={!selectedPropertyType}
           required
           shadow
@@ -230,8 +267,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
         </div>
         <TextInput
           id="propertysize"
+          name="size"
           type="number"
           placeholder="size in sqft"
+          onChange={handleChange}
+          value={formData.size}
           shadow
           required
         />
@@ -245,7 +285,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ nextStep, prevStep }) => {
           </div>
         )}
         <div className="flex justify-end">
-          <Button onClick={handleNext}>
+          <Button type="submit">
             <HiOutlineArrowRight className="h-6 w-6" />
           </Button>
         </div>

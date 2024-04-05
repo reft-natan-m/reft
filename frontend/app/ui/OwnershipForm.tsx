@@ -3,25 +3,39 @@ import { Button, Label, Select, TextInput } from "flowbite-react";
 import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi";
 
 interface OwnershipFormProps {
-  nextStep: () => void;
+  handleSubmit: (data: FormData) => void;
   prevStep?: () => void;
 }
 
+interface FormData {
+  owners: string;
+  ownPercent: string;
+  entity: string;
+}
+
 const OwnershipForm: React.FC<OwnershipFormProps> = ({
-  nextStep,
+  handleSubmit,
   prevStep,
 }) => {
-  const [owners, setOwners] = useState<string>("");
-  const [percentages, setPercentages] = useState<string>("");
-  const [entityType, setEntityType] = useState<string>("Individual");
+  const [formData, setFormData] = useState<any>({
+    owners: "",
+    ownPercent: "",
+    entity: "Individual",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ): void => {
+    const { name, value } = e.target;
+    setFormData((prevState: any) => ({ ...prevState, [name]: value }));
+  };
 
   const handleNext = () => {
-    // Validate and process the owners, percentages, and entityType data if necessary
-    nextStep();
+    handleSubmit(formData);
   };
 
   return (
-    <form className="flex flex-col gap-4 mt-10">
+    <form className="flex flex-col gap-4 mt-10" onSubmit={handleNext}>
       <div>
         <h5 className="mb-5 text-xl font-medium text-gray-900 dark:text-white">
           Ownership Information
@@ -31,10 +45,11 @@ const OwnershipForm: React.FC<OwnershipFormProps> = ({
         </div>
         <TextInput
           id="owners"
+          name="owners"
           type="text"
           placeholder="Enter owner names (separated by commas)"
-          value={owners}
-          onChange={(e) => setOwners(e.target.value)}
+          value={formData.owners}
+          onChange={handleChange}
           required
           shadow
         />
@@ -45,10 +60,12 @@ const OwnershipForm: React.FC<OwnershipFormProps> = ({
         </div>
         <TextInput
           id="percentages"
+          name="ownPercent"
           type="text"
           placeholder="Enter ownership percentages (separated by commas)"
-          value={percentages}
-          onChange={(e) => setPercentages(e.target.value)}
+          value={formData.ownPercent}
+          onChange={handleChange}
+          addon="%"
           required
           shadow
         />
@@ -59,8 +76,9 @@ const OwnershipForm: React.FC<OwnershipFormProps> = ({
         </div>
         <Select
           id="entityType"
-          value={entityType}
-          onChange={(e) => setEntityType(e.target.value)}
+          name="entity"
+          value={formData.entity}
+          onChange={handleChange}
           required
           shadow
         >
@@ -78,7 +96,7 @@ const OwnershipForm: React.FC<OwnershipFormProps> = ({
           </div>
         )}
         <div className="flex justify-end">
-          <Button onClick={handleNext}>
+          <Button type="submit">
             <HiOutlineArrowRight className="h-6 w-6" />
           </Button>
         </div>
