@@ -4,29 +4,45 @@ import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi";
 
 interface MiscFormProps {
   handleSubmit: (data: FormData) => void;
-  prevStep: () => void;
+  nextStep: () => void;
+  prevStep?: () => void;
 }
 
 interface FormData {
   images: FileList | null;
 }
 
-const MiscForm: React.FC<MiscFormProps> = ({ handleSubmit, prevStep }) => {
+const MiscForm: React.FC<MiscFormProps> = ({
+  handleSubmit,
+  nextStep,
+  prevStep,
+}) => {
   const [formData, setFormData] = useState<any>({
     images: null,
   });
+  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
+  const [uploadFail, setUploadFail] = useState<boolean>(false);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setUploadFail(false);
+    setUploadSuccess(false);
+
     if (e.target.files) {
       setFormData((prevState: FormData) => ({
         ...prevState,
         images: e.target.files,
       }));
+      setUploadFail(false);
+      setUploadSuccess(true);
+    } else {
+      setUploadFail(true);
+      setUploadSuccess(false);
     }
   };
 
   const handleNext = () => {
     handleSubmit(formData);
+    nextStep();
   };
 
   return (
@@ -41,6 +57,7 @@ const MiscForm: React.FC<MiscFormProps> = ({ handleSubmit, prevStep }) => {
         <Label
           htmlFor="dropzone-file"
           className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+          color={uploadSuccess ? "success" : uploadFail ? "fail" : ""}
         >
           <div className="flex flex-col items-center justify-center pb-6 pt-5">
             <svg
@@ -72,6 +89,14 @@ const MiscForm: React.FC<MiscFormProps> = ({ handleSubmit, prevStep }) => {
             className="hidden"
             onChange={handleFileChange}
             multiple
+            color={uploadSuccess ? "success" : uploadFail ? "fail" : ""}
+            helperText={
+              uploadSuccess
+                ? "File(s) uploaded successfully!"
+                : uploadFail
+                ? "File upload failed!"
+                : ""
+            }
           />
         </Label>
       </div>

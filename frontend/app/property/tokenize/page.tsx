@@ -10,7 +10,7 @@ import TokenizeForm from "@/app/ui/TokenizationForm";
 import MiscForm from "@/app/ui/MiscForm";
 import TokenizeEnd from "@/app/ui/TokenizeEnd";
 
-interface FormData {
+export interface FormData {
   country: string;
   state: string;
   city: string;
@@ -48,7 +48,7 @@ const Tokenize = () => {
     size: 0,
     owners: "",
     ownPercent: "",
-    entity: "",
+    entity: "Individual",
     value: 0,
     income: 0,
     expense: 0,
@@ -61,16 +61,15 @@ const Tokenize = () => {
     setCurrentStep((prevStep) => prevStep - 1);
   };
 
+  const nextStep = () => {
+    setCurrentStep((prevStep) => prevStep + 1);
+  };
+
   const handleSubmit = (data: any) => {
-    // Update formData
     const updatedFormData = { ...formData, ...data };
     setFormData(updatedFormData);
 
-    // Use updatedFormData directly
     console.log(updatedFormData);
-
-    // Move the setCurrentStep inside the setFormData callback to ensure it's updated after the state
-    setCurrentStep((prevStep) => prevStep + 1);
   };
 
   const handleSubmitAllForms = async () => {
@@ -102,21 +101,45 @@ const Tokenize = () => {
         <Stepper currentStep={currentStep} />
       </div>
       <div className="flex flex-col justify-center max-w-4xl w-full mb-10">
-        {currentStep === 0 && <TokenizeStart handleSubmit={handleSubmit} />}
+        {currentStep === 0 && <TokenizeStart nextStep={nextStep} />}
         {currentStep === 1 && (
-          <PropertyForm prevStep={prevStep} handleSubmit={handleSubmit} />
+          <PropertyForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            handleSubmit={handleSubmit}
+            formData={formData}
+          />
         )}
         {currentStep === 2 && (
-          <OwnershipForm prevStep={prevStep} handleSubmit={handleSubmit} />
+          <OwnershipForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            handleSubmit={handleSubmit}
+            formData={formData}
+          />
         )}
         {currentStep === 3 && (
-          <FinancialForm prevStep={prevStep} handleSubmit={handleSubmit} />
+          <FinancialForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            handleSubmit={handleSubmit}
+            formData={formData}
+          />
         )}
         {currentStep === 4 && (
-          <TokenizeForm prevStep={prevStep} handleSubmit={handleSubmit} />
+          <TokenizeForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            handleSubmit={handleSubmit}
+            formData={formData}
+          />
         )}
         {currentStep === 5 && (
-          <MiscForm prevStep={prevStep} handleSubmit={handleSubmit} />
+          <MiscForm
+            nextStep={nextStep}
+            prevStep={prevStep}
+            handleSubmit={handleSubmit}
+          />
         )}
         {currentStep === 6 && (
           <TokenizeEnd

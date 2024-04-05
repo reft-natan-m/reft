@@ -1,36 +1,29 @@
-import { useState } from "react";
-import { Button, Label, TextInput, Select } from "flowbite-react";
-import Link from "next/link";
+import { Button, Label, TextInput } from "flowbite-react";
 import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi";
+import { FormData } from "@/app/property/tokenize/page";
 
 interface TokenizeFormProps {
   handleSubmit: (data: FormData) => void;
+  nextStep: () => void;
   prevStep?: () => void;
-}
-
-interface FormData {
-  tokens: number;
-  tokenSale: number;
+  formData: FormData;
 }
 
 const TokenizeForm: React.FC<TokenizeFormProps> = ({
   handleSubmit,
+  nextStep,
   prevStep,
+  formData,
 }) => {
-  const [formData, setFormData] = useState<any>({
-    tokens: 100,
-    tokenSale: "",
-  });
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target;
-    setFormData((prevState: any) => ({ ...prevState, [name]: value }));
+    handleSubmit({ ...formData, [name]: value });
   };
 
   const handleNext = () => {
-    handleSubmit(formData);
+    nextStep();
   };
 
   return (

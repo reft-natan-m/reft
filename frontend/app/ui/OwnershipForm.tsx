@@ -1,37 +1,29 @@
-import React, { useState } from "react";
 import { Button, Label, Select, TextInput } from "flowbite-react";
 import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi";
+import { FormData } from "@/app/property/tokenize/page";
 
 interface OwnershipFormProps {
   handleSubmit: (data: FormData) => void;
+  nextStep: () => void;
   prevStep?: () => void;
-}
-
-interface FormData {
-  owners: string;
-  ownPercent: string;
-  entity: string;
+  formData: FormData;
 }
 
 const OwnershipForm: React.FC<OwnershipFormProps> = ({
   handleSubmit,
+  nextStep,
   prevStep,
+  formData,
 }) => {
-  const [formData, setFormData] = useState<any>({
-    owners: "",
-    ownPercent: "",
-    entity: "Individual",
-  });
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target;
-    setFormData((prevState: any) => ({ ...prevState, [name]: value }));
+    handleSubmit({ ...formData, [name]: value });
   };
 
   const handleNext = () => {
-    handleSubmit(formData);
+    nextStep();
   };
 
   return (

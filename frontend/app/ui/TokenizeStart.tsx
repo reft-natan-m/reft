@@ -1,10 +1,10 @@
 import React from "react";
 
 interface TokenizeStartProps {
-  handleSubmit: (data: any) => void;
+  nextStep: () => void;
 }
 
-const TokenizeStart: React.FC<TokenizeStartProps> = ({ handleSubmit }) => {
+const TokenizeStart: React.FC<TokenizeStartProps> = ({ nextStep }) => {
   return (
     <div className="flex flex-col items-center">
       <h2 className="text-xl font-medium mb-4">
@@ -17,7 +17,7 @@ const TokenizeStart: React.FC<TokenizeStartProps> = ({ handleSubmit }) => {
       </p>
       <button
         className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-        onClick={handleSubmit}
+        onClick={nextStep}
       >
         Get Started
       </button>

@@ -1,23 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Label, TextInput, Select } from "flowbite-react";
 import { HiOutlineArrowRight, HiOutlineArrowLeft } from "react-icons/hi";
+import { FormData } from "@/app/property/tokenize/page";
 
 interface PropertyFormProps {
+  nextStep: () => void;
   prevStep?: () => void;
   handleSubmit: (data: FormData) => void;
-}
-
-interface FormData {
-  country: string;
-  state: string;
-  city: string;
-  street1: string;
-  street2: string;
-  zip: string;
-  year: number;
-  propType: string;
-  propSubtype: string;
-  size: number;
+  formData: FormData;
 }
 
 const usStates = [
@@ -85,28 +75,24 @@ const propertyTypes: { [key: string]: string[] } = {
 };
 
 const PropertyForm: React.FC<PropertyFormProps> = ({
+  nextStep,
   prevStep,
   handleSubmit,
+  formData,
 }) => {
-  const [selectedPropertyType, setSelectedPropertyType] = useState<string>("");
-  const [formData, setFormData] = useState<any>({
-    country: "United States",
-    state: "",
-    city: "",
-    street1: "",
-    street2: "",
-    zip: "",
-    year: "",
-    propType: "",
-    propSubtype: "",
-    size: "",
-  });
+  const [selectedPropertyType, setSelectedPropertyType] = useState<string>(
+    formData.propType || ""
+  );
+
+  useEffect(() => {
+    setSelectedPropertyType(formData.propType || "");
+  }, [formData.propType]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target;
-    setFormData((prevState: any) => ({ ...prevState, [name]: value }));
+    handleSubmit({ ...formData, [name]: value });
   };
 
   const handlePropertyTypeChange = (
@@ -114,11 +100,12 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   ) => {
     const type = e.target.value;
     setSelectedPropertyType(type);
-    setFormData((prevState: any) => ({ ...prevState, propType: type }));
+    handleSubmit({ ...formData, propType: type });
   };
 
-  const handleNext = () => {
-    handleSubmit(formData);
+  const handleNext = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    nextStep();
   };
 
   return (
@@ -280,7 +267,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
       </div>
       <div>
         <div className="mb-2 block">
-          <Label htmlFor="PropertySize" value="Property Size" />
+          <Label htmlFor="PropertySize" value="Property Size (sqft)" />
         </div>
         <TextInput
           id="propertysize"
