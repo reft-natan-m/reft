@@ -13,6 +13,7 @@ import TokenizeEnd from "@/app/ui/TokenizeEnd";
 interface FormData {
   country: string;
   state: string;
+  city: string;
   street1: string;
   street2: string;
   zip: string;
@@ -37,6 +38,7 @@ const Tokenize = () => {
   const [formData, setFormData] = useState<FormData>({
     country: "United States",
     state: "",
+    city: "",
     street1: "",
     street2: "",
     zip: "",

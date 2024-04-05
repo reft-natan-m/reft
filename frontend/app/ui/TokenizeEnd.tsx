@@ -24,7 +24,7 @@ const TokenizeEnd: React.FC<TokenizeStartProps> = ({
         days to complete. During this time, you will receive email updates on
         the progress of the verification process.
       </p>
-      <div className="flex justify-between">
+      <div className="flex justify-between w-full">
         <div className="flex justify-start">
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"

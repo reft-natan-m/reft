@@ -10,6 +10,7 @@ interface PropertyFormProps {
 interface FormData {
   country: string;
   state: string;
+  city: string;
   street1: string;
   street2: string;
   zip: string;
@@ -91,6 +92,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   const [formData, setFormData] = useState<any>({
     country: "United States",
     state: "",
+    city: "",
     street1: "",
     street2: "",
     zip: "",
@@ -151,6 +153,21 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
             </option>
           ))}
         </Select>
+      </div>
+      <div>
+        <div className="mb-2 block">
+          <Label htmlFor="City" value="City" />
+        </div>
+        <TextInput
+          id="city"
+          name="city"
+          type="text"
+          placeholder="city"
+          onChange={handleChange}
+          value={formData.city}
+          required
+          shadow
+        />
       </div>
       <div>
         <div className="mb-2 block">
