@@ -7,12 +7,17 @@ import {
   NavbarToggle,
 } from "flowbite-react";
 import Link from "next/link";
-import Button from "./Button";
 import UserDropdown from "./UserDropdown";
 import { useSession } from "next-auth/react";
+import CTA from "./CTA";
 
 function Nav() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  // Check if session data is still being fetched
+  if (status === "loading") {
+    return null; // or any loading indicator
+  }
 
   return (
     <Navbar fluid rounded>
@@ -33,18 +38,17 @@ function Nav() {
               <Link href="/auth/signin">Sign in</Link>
             </div>
             <div className="ml-4">
-              <Button href="/auth/signup" text="Signup" />
+              <CTA href="/auth/signup" text="Signup" />
             </div>
           </div>
         )}
         <NavbarToggle />
       </div>
       <NavbarCollapse>
-        <NavbarLink href="#">Thing 1</NavbarLink>
-        <NavbarLink href="#">Thing 2</NavbarLink>
-        <NavbarLink href="#">Thing 3</NavbarLink>
-        <NavbarLink href="#">Thing 4</NavbarLink>
-        <NavbarLink href="#">Thing 5</NavbarLink>
+        <NavbarLink href="#">Search Properties</NavbarLink>
+        <NavbarLink href="#">Buy Tokens</NavbarLink>
+        <NavbarLink href="#">Sell Tokens</NavbarLink>
+        <NavbarLink href="/property/tokenize">Tokenize Property</NavbarLink>
       </NavbarCollapse>
     </Navbar>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { FloatingLabel } from "flowbite-react";
-import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 
 interface FormData {
@@ -9,7 +8,7 @@ interface FormData {
   password: string;
 }
 
-function ChangeEmailForm() {
+function ChangeEmail() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "test",
@@ -40,9 +39,7 @@ function ChangeEmailForm() {
     if (formData.password !== passwordConfirmation) {
       setPasswordError("Passwords do not match");
       return;
-    }
-
-    if (formData.email !== emailConfirmation) {
+    } else if (formData.email !== emailConfirmation) {
       setEmailError("Emails do not match");
       return;
     }
@@ -115,4 +112,4 @@ function ChangeEmailForm() {
   );
 }
 
-export default ChangeEmailForm;
+export default ChangeEmail;
