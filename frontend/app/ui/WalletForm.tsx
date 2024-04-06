@@ -3,6 +3,8 @@
 import { Modal, List } from "flowbite-react";
 import Link from "next/link";
 import { useState } from "react";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { WalletConnect } from "./WalletConnect";
 
 function WalletForm() {
   const [openModal, setOpenModal] = useState(false);
@@ -279,9 +281,7 @@ function WalletForm() {
                 fill="#F5841F"
               />
             </svg>
-            <span className="flex-1 ms-3 whitespace-nowrap">
-              Metamask Test Button
-            </span>
+            <WalletConnect/>
           </Link>
         </li>
       </ul>

@@ -13,6 +13,8 @@
     "@dicebear/collection": "^8.0.0",
     "@dicebear/core": "^8.0.0",
     "@prisma/client": "^5.11.0",
+    "@rainbow-me/rainbowkit": "^2.0.5",
+    "@tanstack/react-query": "^5.28.14",
     "bcrypt": "^5.1.1",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.3",
@@ -21,7 +23,9 @@
     "next-auth": "^4.24.7",
     "next-themes": "^0.3.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "viem": "^2.9.9",
+    "wagmi": "^2.5.18"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
