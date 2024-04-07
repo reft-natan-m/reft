@@ -17,7 +17,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 const PropertyCard: React.FC<PropertyCardProps> = ({ data }) => {
   console.log(data);
   return (
-    <div className="relative">
+    <div className="">
       <Card
         className="max-w-sm"
         renderImage={() => (

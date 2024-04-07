@@ -17,7 +17,7 @@ interface CardData {
 
 const cardDataArray: CardData[] = Array.from({ length: 12 }, (_, index) => ({
   id: index + 1,
-  state: "California",
+  state: "CA",
   city: `Los Angeles ${index + 1}`,
   street: `${index + 1} Main St`,
   zip: `9000${index + 1}`,
@@ -35,6 +35,7 @@ const CardCarousel: React.FC = () => {
         <div className="w-full max-w-lg">
           <div className="h-96">
             <Carousel
+              pauseOnHover
               indicators={false}
               onSlideChange={(index) => console.log("onSlideChange()", index)}
             >

@@ -45,7 +45,7 @@ function Nav() {
         <NavbarToggle />
       </div>
       <NavbarCollapse>
-        <NavbarLink href="#">Search Properties</NavbarLink>
+        <NavbarLink href="/property/search">Search Properties</NavbarLink>
         <NavbarLink href="#">Buy Tokens</NavbarLink>
         <NavbarLink href="#">Sell Tokens</NavbarLink>
         {session && (
