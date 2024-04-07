@@ -1,7 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import Wallet from "./wallet/page";
+import CardCarousel from "./ui/CardCarousel";
+import SearchBar from "./ui/SearchBar";
 
 const Home = () => {
   const { data: session, status } = useSession();
@@ -11,8 +12,11 @@ const Home = () => {
 
   return (
     <div>
-      <h1>Hello REFT Bois</h1>
-      <Wallet/>
+      <SearchBar />
+      <h3 className="mb-4 text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:mb-6 sm:text-2xl">
+        Real Estate Near You.
+      </h3>
+      <CardCarousel />
     </div>
   );
 };
