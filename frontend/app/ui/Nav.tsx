@@ -48,7 +48,9 @@ function Nav() {
         <NavbarLink href="#">Search Properties</NavbarLink>
         <NavbarLink href="#">Buy Tokens</NavbarLink>
         <NavbarLink href="#">Sell Tokens</NavbarLink>
-        <NavbarLink href="/property/tokenize">Tokenize Property</NavbarLink>
+        {session && (
+          <NavbarLink href="/property/tokenize">Tokenize Property</NavbarLink>
+        )}
       </NavbarCollapse>
     </Navbar>
   );
