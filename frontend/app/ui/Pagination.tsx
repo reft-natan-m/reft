@@ -20,7 +20,7 @@ const PaginationComp: React.FC<PaginationCompProps> = ({ totalPages }) => {
   };
 
   return (
-    <div className="flex justify-center mt-4">
+    <div className="flex justify-center mb-2">
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

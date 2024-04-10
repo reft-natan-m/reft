@@ -39,9 +39,9 @@ function UserSidebar() {
           <Sidebar.Item href="#" icon={HiBookOpen}>
             History
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiIdentification}>
+          {/* <Sidebar.Item href="#" icon={HiIdentification}>
             Wallet
-          </Sidebar.Item>
+          </Sidebar.Item> */}
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>

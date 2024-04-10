@@ -1,7 +1,7 @@
 import React from "react";
 import PaginationComp from "@/app/ui/Pagination";
 import PropertyCard from "@/app/ui/PropertyCard";
-import SearchBar from "@/app/ui/SearchBar";
+import SearchNav from "@/app/ui/SearchNav";
 
 interface SearchResultProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -34,18 +34,20 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
   const entries = cardDataArray.slice(start, end);
 
   return (
-    <div className="flex justify-center mt-4">
-      <div className="w-full">
-        <SearchBar />
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-screen-xl mx-auto mt-8">
-          {entries.map((property) => (
-            <div key={property.id} className="border p-4 overflow-x-hidden">
-              {/* Render your property card here */}
-              <PropertyCard data={property} />
-            </div>
-          ))}
+    <div>
+      <SearchNav per_Page={per_page} totalProperties={totalProperties} />
+      <div className="flex justify-center mt-4">
+        <div className="w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-screen-xl mx-auto mt-8">
+            {entries.map((property) => (
+              <div key={property.id} className="border p-4 overflow-x-hidden">
+                {/* Render your property card here */}
+                <PropertyCard data={property} />
+              </div>
+            ))}
+          </div>
+          <PaginationComp totalPages={Math.ceil(totalProperties / per_page)} />
         </div>
-        <PaginationComp totalPages={Math.ceil(totalProperties / per_page)} />
       </div>
     </div>
   );

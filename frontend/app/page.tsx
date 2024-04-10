@@ -5,15 +5,15 @@ import CardCarousel from "./ui/CardCarousel";
 import SearchBar from "./ui/SearchBar";
 
 const Home = () => {
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
 
-  console.log(session);
-  console.log(status);
+  // console.log(session);
+  // console.log(status);
 
   return (
     <div>
       <SearchBar />
-      <h3 className="mb-4 text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:mb-6 sm:text-2xl">
+      <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:mb-6 sm:text-2xl">
         Real Estate Near You.
       </h3>
       <CardCarousel />
