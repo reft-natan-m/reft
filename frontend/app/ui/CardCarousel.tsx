@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { Carousel } from "flowbite-react";
 import PropertyCard from "./PropertyCard";
 
@@ -46,10 +47,7 @@ const CardCarousel: React.FC = () => {
           onSlideChange={(index) => console.log("onSlideChange()", index)}
         >
           {chunkedData.map((chunk, index) => (
-            <div
-              key={index}
-              className="flex h-full items-center justify-center"
-            >
+            <div key={index} className="flex items-center justify-center">
               {chunk.map((data, dataIndex) => (
                 <div
                   key={data.id}
