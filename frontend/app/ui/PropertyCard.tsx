@@ -15,11 +15,11 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ data }) => {
-  console.log(data);
+  //console.log(data);
   return (
-    <div className="relative">
+    <div className="w-auto 2xl:w-96">
       <Card
-        className="max-w-sm"
+        className=""
         renderImage={() => (
           <Image
             width={500}
@@ -33,14 +33,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ data }) => {
           {formatter.format(data.value)}
         </h5>
         <List horizontal>
-          <List.Item>Token(s) For Sale: {data.tokenForSale}</List.Item>
+          <List.Item className="text-center">
+            Token(s) For Sale: {data.tokenForSale}
+          </List.Item>
           <span>|</span>
-          <List.Item>Total Tokens: {data.tokens}</List.Item>
-          <List.Item>
+          <List.Item className="text-center">
+            Total Tokens: {data.tokens}
+          </List.Item>
+          <List.Item className="text-center">
             Token Price: {formatter.format(data.tokenPrice)}
           </List.Item>
         </List>
-        <p className="font-normal text-gray-700 dark:text-gray-400">
+        <p className="text-center font-normal text-gray-700 dark:text-gray-400">
           {data.street}, {data.city}, {data.state}, {data.zip}
         </p>
       </Card>

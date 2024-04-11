@@ -1,6 +1,15 @@
-import React from "react";
+"use client";
+import { useRouter } from "next/navigation";
+import React, { useState, ChangeEvent, FormEventHandler } from "react";
 
 const SearchBar: React.FC = () => {
+  const router = useRouter();
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+
+    router.refresh();
+    router.push("/property/search");
+  };
   return (
     <div className="relative mb-10">
       <img
@@ -16,7 +25,10 @@ const SearchBar: React.FC = () => {
                 <h3 className="mb-4 text-xl font-semibold sm:text-center text-white sm:mb-6 sm:text-2xl">
                   Find Your Perfect Investment.
                 </h3>
-                <form className="flex items-center mx-auto">
+                <form
+                  className="flex items-center mx-auto"
+                  onSubmit={handleSubmit}
+                >
                   <label className="sr-only">Search</label>
                   <div className="relative w-full">
                     <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"></div>
@@ -40,9 +52,9 @@ const SearchBar: React.FC = () => {
                     >
                       <path
                         stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                       />
                     </svg>

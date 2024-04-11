@@ -17,7 +17,7 @@ interface CardData {
 
 const cardDataArray: CardData[] = Array.from({ length: 12 }, (_, index) => ({
   id: index + 1,
-  state: "California",
+  state: "CA",
   city: `Los Angeles ${index + 1}`,
   street: `${index + 1} Main St`,
   zip: `9000${index + 1}`,
@@ -28,27 +28,41 @@ const cardDataArray: CardData[] = Array.from({ length: 12 }, (_, index) => ({
   image: "/images/Dunno.jpg",
 }));
 
+const chunkArray = (arr: any[], size: number) => {
+  return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
+    arr.slice(index * size, index * size + size)
+  );
+};
+
 const CardCarousel: React.FC = () => {
+  const chunkedData = chunkArray(cardDataArray, 3); // Split data into chunks of 3
+
   return (
-    <div className="px-4 py-16 mx-auto max-w-screen-xl bg-gray-50 dark:bg-gray-500 rounded-full border-8 border-gray-900 dark:border-gray-200">
-      <div className="flex justify-center">
-        <div className="w-full max-w-lg">
-          <div className="h-96">
-            <Carousel
-              indicators={false}
-              onSlideChange={(index) => console.log("onSlideChange()", index)}
+    <div className="w-full h-screen overflow-hidden flex items-center justify-center">
+      <div className="w-full max-w-screen-xl h-full">
+        <Carousel
+          pauseOnHover
+          indicators={false}
+          onSlideChange={(index) => console.log("onSlideChange()", index)}
+        >
+          {chunkedData.map((chunk, index) => (
+            <div
+              key={index}
+              className="flex h-full items-center justify-center"
             >
-              {cardDataArray.map((data, index) => (
+              {chunk.map((data, dataIndex) => (
                 <div
                   key={data.id}
-                  className="flex h-full items-center justify-center bg-gray-400 dark:bg-gray-700 dark:text-white"
+                  className={`mx-10 ${
+                    dataIndex !== chunk.length - 1 ? "mr-4" : ""
+                  }`}
                 >
                   <PropertyCard data={data} />
                 </div>
               ))}
-            </Carousel>
-          </div>
-        </div>
+            </div>
+          ))}
+        </Carousel>
       </div>
     </div>
   );
