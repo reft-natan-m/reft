@@ -4,6 +4,7 @@ import PropertyCard from "@/app/ui/PropertyCard";
 import SearchNav from "@/app/ui/SearchNav";
 import ModalComp from "@/app/ui/ModalComp";
 import PropertyDetail from "@/app/ui/PropertyDetail";
+import UserSidebar from "@/app/ui/UserSidebar";
 
 interface SearchResultProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -62,34 +63,38 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
   const end = start + per_page;
 
   const entries = cardDataArray.slice(start, end);
-
-  const search = true;
+  const search = false;
 
   return (
-    <div>
+    <div className="flex">
       <SearchNav
         search={search}
         per_Page={per_page}
         totalProperties={totalProperties}
       />
-      <div className="flex justify-center mt-4 mb-24">
-        <div className="w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-screen-xl mx-auto mt-8">
-            {entries.map((property, index) => (
-              <div key={property.id} className="p-2 overflow-x-hidden">
-                <button onClick={() => handleOpenModal(index)}>
-                  <PropertyCard data={property} />
-                </button>
-                <ModalComp
-                  openModal={openModals[index]}
-                  setOpenModal={() => handleCloseModal(index)}
-                  modalHeader={modalHeader}
-                  modalSize="3xl"
-                >
-                  <PropertyDetail data={property} />
-                </ModalComp>
-              </div>
-            ))}
+      <div className="h-96 mt-4">
+        <UserSidebar />
+      </div>
+      <div className="ml-10">
+        <div className="flex justify-center mt-4 mb-24">
+          <div className="w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-screen-xl mx-auto mt-8">
+              {entries.map((property, index) => (
+                <div key={property.id} className="p-2 overflow-x-hidden">
+                  <button onClick={() => handleOpenModal(index)}>
+                    <PropertyCard data={property} />
+                  </button>
+                  <ModalComp
+                    openModal={openModals[index]}
+                    setOpenModal={() => handleCloseModal(index)}
+                    modalHeader={modalHeader}
+                    modalSize="3xl"
+                  >
+                    <PropertyDetail data={property} />
+                  </ModalComp>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
