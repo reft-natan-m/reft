@@ -17,29 +17,12 @@ import {
   optimism,
   polygon,
   sepolia,
-  Chain
 } from "wagmi/chains";
 import {
   getDefaultConfig,
   RainbowKitProvider,
   darkTheme,
 } from "@rainbow-me/rainbowkit";
-
-const hardhatChain: Chain = {
-  id: 31337,
-  name: 'Hardhat',
-  rpcUrls: {
-    default: {
-      http: ['http://127.0.0.1:8545'],
-    }
-  },
-  testnet: true,
-  nativeCurrency: {
-    name: "ethereum",
-    symbol: "ETH",
-    decimals: 2
-  },
-};
 
 const config = getDefaultConfig({
   appName: "RainbowKit App",
@@ -49,7 +32,6 @@ const config = getDefaultConfig({
     polygon,
     optimism,
     arbitrum,
-    hardhatChain,
     base,
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [sepolia] : []),
   ],

@@ -5,7 +5,7 @@ const Wallet = () => {
   return (
     <div className="flex justify-center items-center h-screen">
       Currently unavailable
-      <WalletForm />
+      {/* <WalletForm /> */}
     </div>
   );
 };
