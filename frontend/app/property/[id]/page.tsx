@@ -26,8 +26,10 @@ const page = () => {
     entity: "",
   };
   return (
-    <div>
-      <PropertyDetail data={PropertyData} />
+    <div className="flex justify-center items-center h-screen mt-4">
+      <div className="w-1/3">
+        <PropertyDetail data={PropertyData} />
+      </div>
     </div>
   );
 };

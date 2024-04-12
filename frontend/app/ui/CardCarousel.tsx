@@ -1,7 +1,10 @@
 "use client";
+
 import React, { useState } from "react";
 import { Carousel } from "flowbite-react";
 import PropertyCard from "./PropertyCard";
+import ModalComp from "./ModalComp";
+import PropertyDetail from "@/app/ui/PropertyDetail";
 
 interface CardData {
   id: number;
@@ -16,17 +19,28 @@ interface CardData {
   image: string;
 }
 
-const cardDataArray: CardData[] = Array.from({ length: 12 }, (_, index) => ({
+const cardDataArray = Array.from({ length: 12 }, (_, index) => ({
   id: index + 1,
   state: "CA",
   city: `Los Angeles ${index + 1}`,
-  street: `${index + 1} Main St`,
+  street1: `${index + 1} Main St`,
+  street2: "",
   zip: `9000${index + 1}`,
+  year: 1900 + (index + 1),
   value: 500000 + (index + 1) * 10000,
   tokens: 100 + index,
   tokenForSale: 10 + index,
   tokenPrice: (500000 + (index + 1) * 10000) / (100 + index),
+  propType: "Residential",
+  propSubtype: "Single Family",
+  size: 1000 + index * 100,
+  owners: "Garry",
+  ownPercent: "100%",
+  entity: "individual",
+  income: 100 + index * 100,
+  expense: 10 + index * 10,
   image: "/images/Dunno.jpg",
+  sizeValue: (500000 + (index + 1) * 10000) / (1000 + index * 100),
 }));
 
 const chunkArray = (arr: any[], size: number) => {
@@ -36,26 +50,50 @@ const chunkArray = (arr: any[], size: number) => {
 };
 
 const CardCarousel: React.FC = () => {
-  const chunkedData = chunkArray(cardDataArray, 3); // Split data into chunks of 3
+  const chunkedData = chunkArray(cardDataArray, 3);
+  const [openModals, setOpenModals] = useState<boolean[][]>(
+    Array(chunkedData.length)
+      .fill([])
+      .map(() => Array(3).fill(false))
+  );
+
+  const handleOpenModal = (chunkIndex: number, cardIndex: number) => {
+    const newModals = [...openModals];
+    newModals[chunkIndex][cardIndex] = true;
+    setOpenModals(newModals);
+  };
+
+  const handleCloseModal = (chunkIndex: number, cardIndex: number) => {
+    const newModals = [...openModals];
+    newModals[chunkIndex][cardIndex] = false;
+    setOpenModals(newModals);
+  };
 
   return (
     <div className="w-full h-screen overflow-hidden flex items-center justify-center">
       <div className="w-full max-w-screen-xl h-full">
-        <Carousel
-          pauseOnHover
-          indicators={false}
-          onSlideChange={(index) => console.log("onSlideChange()", index)}
-        >
-          {chunkedData.map((chunk, index) => (
-            <div key={index} className="flex items-center justify-center">
-              {chunk.map((data, dataIndex) => (
+        <Carousel pauseOnHover indicators={false}>
+          {chunkedData.map((chunk, chunkIndex) => (
+            <div key={chunkIndex} className="flex items-center justify-center">
+              {chunk.map((data, cardIndex) => (
                 <div
                   key={data.id}
                   className={`mx-10 ${
-                    dataIndex !== chunk.length - 1 ? "mr-4" : ""
+                    cardIndex !== chunk.length - 1 ? "mr-4" : ""
                   }`}
                 >
-                  <PropertyCard data={data} />
+                  <button
+                    onClick={() => handleOpenModal(chunkIndex, cardIndex)}
+                  >
+                    <PropertyCard data={data} />
+                  </button>
+                  <ModalComp
+                    key={`modal-${chunkIndex}-${cardIndex}`}
+                    openModal={openModals[chunkIndex][cardIndex]}
+                    setOpenModal={() => handleCloseModal(chunkIndex, cardIndex)}
+                  >
+                    <PropertyDetail data={data} />
+                  </ModalComp>
                 </div>
               ))}
             </div>

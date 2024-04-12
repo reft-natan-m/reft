@@ -65,22 +65,22 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
         </li>
         <li>
           <div className="grid grid-cols-3 mt-4 mb-4 gap-4">
-            <div className="bg-gray-800 border-2 border-gray-400 text-center font-bold">
+            <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
               {data.propSubtype} {data.propType}
             </div>
-            <div className="bg-gray-800 border-2 border-gray-400 text-center font-bold">
+            <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
               {data.size} sqft
             </div>
-            <div className="bg-gray-800 border-2 border-gray-400 text-center font-bold">
+            <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
               {formatter.format(data.sizeValue)}/sqft
             </div>
-            <div className="bg-gray-800 border-2 border-gray-400 text-center font-bold">
+            <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
               Built in {data.year}
             </div>
-            <div className="bg-gray-800 border-2 border-gray-400 text-center font-bold">
+            <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
               {formatter.format(data.expense)} Expenses/year
             </div>
-            <div className="bg-gray-800 border-2 border-gray-400 text-center font-bold">
+            <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
               {formatter.format(data.income)} Income/year
             </div>
           </div>

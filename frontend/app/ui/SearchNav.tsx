@@ -22,7 +22,7 @@ const SearchNav: React.FC<SearchBarProps> = ({ per_Page, totalProperties }) => {
       {/* Left */}
       <form onSubmit={handleSubmit} className="flex items-center">
         <label className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
-          Your Email
+          Search Bar
         </label>
         <div className="relative w-96">
           <input
