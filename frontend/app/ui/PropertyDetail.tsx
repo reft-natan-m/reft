@@ -30,7 +30,10 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
           <div className="mt-4 mb-4">
             <div className="flex justify-between">
               <div className="order-2">
-                <BuySellButtons bsTotals={buySell} />
+                <BuySellButtons
+                  bsTotals={buySell}
+                  tokenPrice={data.tokenPrice}
+                />
               </div>
               <div className="flex flex-col justify-center">
                 <div className="flex justify-between">

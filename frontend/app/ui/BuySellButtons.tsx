@@ -6,9 +6,13 @@ import ModalComp from "./ModalComp";
 
 interface BuySellButtonsProps {
   bsTotals: BuySellData;
+  tokenPrice: number;
 }
 
-const BuySellButtons: React.FC<BuySellButtonsProps> = ({ bsTotals }) => {
+const BuySellButtons: React.FC<BuySellButtonsProps> = ({
+  bsTotals,
+  tokenPrice,
+}) => {
   const [openModal, setOpenModal] = useState(false);
   const [buttonOption, setButtonOption] = useState(false);
   const [modalHeader, setModalHeader] = useState("");
@@ -41,6 +45,7 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({ bsTotals }) => {
               <BuySellTokens
                 setOpenModal={setOpenModal}
                 totalOption={totalOption}
+                tokenPrice={tokenPrice}
               />
             </div>
           ) : (
@@ -48,6 +53,7 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({ bsTotals }) => {
               <BuySellTokens
                 setOpenModal={setOpenModal}
                 totalOption={totalOption}
+                tokenPrice={tokenPrice}
               />
             </div>
           )}
