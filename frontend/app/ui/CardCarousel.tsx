@@ -1,23 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Carousel } from "flowbite-react";
+import { Carousel, ModalHeader } from "flowbite-react";
 import PropertyCard from "./PropertyCard";
 import ModalComp from "./ModalComp";
 import PropertyDetail from "@/app/ui/PropertyDetail";
-
-interface CardData {
-  id: number;
-  state: string;
-  city: string;
-  street: string;
-  zip: string;
-  value: number;
-  tokens: number;
-  tokenForSale: number;
-  tokenPrice: number;
-  image: string;
-}
 
 const cardDataArray = Array.from({ length: 12 }, (_, index) => ({
   id: index + 1,
@@ -91,6 +78,8 @@ const CardCarousel: React.FC = () => {
                     key={`modal-${chunkIndex}-${cardIndex}`}
                     openModal={openModals[chunkIndex][cardIndex]}
                     setOpenModal={() => handleCloseModal(chunkIndex, cardIndex)}
+                    modalHeader={"Token Details"}
+                    modalSize="3xl"
                   >
                     <PropertyDetail data={data} />
                   </ModalComp>

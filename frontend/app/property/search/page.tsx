@@ -13,6 +13,7 @@ interface SearchResultProps {
 }
 
 const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
+  const modalHeader = "Token Details";
   const page = searchParams["page"] ? Number(searchParams["page"]) : 1;
   const per_page = searchParams["per_page"]
     ? Number(searchParams["per_page"])
@@ -79,6 +80,8 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
                 <ModalComp
                   openModal={openModals[index]}
                   setOpenModal={() => handleCloseModal(index)}
+                  modalHeader={modalHeader}
+                  modalSize="3xl"
                 >
                   <PropertyDetail data={property} />
                 </ModalComp>

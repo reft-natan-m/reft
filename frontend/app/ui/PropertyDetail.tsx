@@ -1,6 +1,7 @@
 import React from "react";
-import { PropertyData } from "./CardData";
+import { PropertyData, BuySellData } from "./CardData";
 import GalleryComp from "@/app/ui/GalleryComp";
+import BuySellButtons from "./BuySellButtons";
 
 interface PropertyDetailProps {
   data: PropertyData;
@@ -12,6 +13,11 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
+  const buySell: BuySellData = {
+    sellTotal: 10,
+    buyTotal: data.tokenForSale,
+  };
+
   return (
     <div className="flex">
       <ul className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -23,8 +29,10 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
         <li>
           <div className="mt-4 mb-4">
             <div className="flex justify-between">
-              <div className="order-2">button</div>
-              <div className="flex flex-col">
+              <div className="order-2">
+                <BuySellButtons bsTotals={buySell} />
+              </div>
+              <div className="flex flex-col justify-center">
                 <div className="flex justify-between">
                   <h5 className="text-start text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                     {formatter.format(data.value)}

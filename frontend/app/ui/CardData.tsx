@@ -34,3 +34,8 @@ export interface PropertyData {
   image: string;
   sizeValue: number;
 }
+
+export interface BuySellData {
+  sellTotal: number;
+  buyTotal: number;
+}
