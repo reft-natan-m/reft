@@ -10,27 +10,38 @@ import {
   HiUser,
   HiViewBoards,
 } from "react-icons/hi";
+import { useSession } from "next-auth/react";
 
 function UserSidebar() {
+  const { data: session } = useSession();
   return (
     <Sidebar aria-label="User Sidebar" className="justify-start">
       <Sidebar.Items>
         <Sidebar.ItemGroup>
           <Sidebar.Item
-            href="/user/[id]/settings/email"
+            href={`/user/${session?.user?.name}/settings/email`}
             icon={HiShieldExclamation}
           >
             Change Email
           </Sidebar.Item>
-          <Sidebar.Item href="/user/[id]/settings/password" icon={HiViewBoards}>
+          <Sidebar.Item
+            href={`/user/${session?.user?.name}/settings/password`}
+            icon={HiViewBoards}
+          >
             Change Password
           </Sidebar.Item>
-          <Sidebar.Item href="/user/[id]/settings/username" icon={HiUser}>
+          <Sidebar.Item
+            href={`/user/${session?.user?.name}/settings/username`}
+            icon={HiUser}
+          >
             Change Username
           </Sidebar.Item>
         </Sidebar.ItemGroup>
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="#" icon={HiOfficeBuilding}>
+          <Sidebar.Item
+            href={`/user/${session?.user?.name}/properties`}
+            icon={HiOfficeBuilding}
+          >
             Properties
           </Sidebar.Item>
           <Sidebar.Item href="/property/tokenize" icon={HiCurrencyDollar}>
@@ -39,9 +50,9 @@ function UserSidebar() {
           <Sidebar.Item href="#" icon={HiBookOpen}>
             History
           </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiIdentification}>
+          {/* <Sidebar.Item href="#" icon={HiIdentification}>
             Wallet
-          </Sidebar.Item>
+          </Sidebar.Item> */}
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>

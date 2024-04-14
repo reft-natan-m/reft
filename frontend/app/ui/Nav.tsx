@@ -10,13 +10,29 @@ import Link from "next/link";
 import UserDropdown from "./UserDropdown";
 import { useSession } from "next-auth/react";
 import CTA from "./CTA";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 function Nav() {
   const { data: session, status } = useSession();
 
   // Check if session data is still being fetched
   if (status === "loading") {
-    return null; // or any loading indicator
+    return (
+      <Navbar fluid rounded>
+        <NavbarBrand href="/">
+          <img src="/images/Dunno.jpg" className="mr-3 h-6 sm:h-9" alt="LOGO" />
+          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+            REFT
+          </span>
+        </NavbarBrand>
+        <div className="flex md:order-2">
+          <NavbarToggle />
+        </div>
+        <NavbarCollapse className="flex-grow justify-center ml-32">
+          <NavbarLink href="/property/search">Search Properties</NavbarLink>
+        </NavbarCollapse>
+      </Navbar>
+    );
   }
 
   return (
@@ -28,6 +44,11 @@ function Nav() {
         </span>
       </NavbarBrand>
       <div className="flex md:order-2">
+        {session && (
+          <div className="mr-20">
+            <ConnectButton />
+          </div>
+        )}
         {session ? (
           <div>
             <UserDropdown />
@@ -44,11 +65,11 @@ function Nav() {
         )}
         <NavbarToggle />
       </div>
-      <NavbarCollapse>
-        <NavbarLink href="#">Search Properties</NavbarLink>
-        <NavbarLink href="#">Buy Tokens</NavbarLink>
-        <NavbarLink href="#">Sell Tokens</NavbarLink>
-        <NavbarLink href="/property/tokenize">Tokenize Property</NavbarLink>
+      <NavbarCollapse className="flex-grow justify-center ml-32">
+        <NavbarLink href="/property/search">Search Properties</NavbarLink>
+        {session && (
+          <NavbarLink href="/property/tokenize">Tokenize Property</NavbarLink>
+        )}
       </NavbarCollapse>
     </Navbar>
   );
