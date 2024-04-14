@@ -35,8 +35,8 @@ model Property {
   income           Int
   expense          Int
   tokens           Token[]
-  totalTokenMinted Int
-  tokenSale        Int
+  tokensMinted     Int
+  tokenforSale     Int
   images           Int
 }
 

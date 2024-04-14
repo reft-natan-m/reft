@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     where: {
       email: email,
     },
+    include: { tokens: true },
   });
 
   if (!user) {
@@ -29,6 +30,6 @@ export async function GET(request: NextRequest) {
     email: user.email,
     emailVerified: user.emailVerified,
     avatar: user.avatar,
-    propertyIds: user.propertyIds,
+    tokens: user.tokens,
   });
 }
