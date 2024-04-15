@@ -29,14 +29,12 @@ model Property {
   propType         String
   propSubtype      String
   size             Int
-  ownPercent       String
-  entity           String
   value            Int
   income           Int
   expense          Int
   tokens           Token[]
   tokensMinted     Int
-  tokenforSale     Int
+  tokensforSale    Int?
   images           Int
 }
 
@@ -47,14 +45,6 @@ model Token {
   user            User      @relation(fields: [userId], references: [id])
   userId          String    @db.ObjectId
   numberOfTokens  Int
+  listed          Boolean?
+  dateListed      DateTime?
 }
-
-// model Listing {
-//   id             String @id @default(auto()) @map("_id") @db.ObjectId
-//   numberOfTokens Int
-//   seller         User
-// }
-
-// model Transaction {
-//   id            String @id @default(auto()) @map("_id") @db.ObjectId
-// }
