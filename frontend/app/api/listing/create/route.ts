@@ -16,15 +16,18 @@ export async function POST(req: NextRequest) {
     }
 
     const tokenToSplit = prismaUser.tokens.map((token) => {
-      if (token.propertyId === propertyId) {
+      if (token.propertyId === propertyId && token.listed === (false || null)) {
         return token;
       }
     });
 
     if (!tokenToSplit[0]) {
-      return new NextResponse("User doesnt own any tokens for this property", {
-        status: 400,
-      });
+      return new NextResponse(
+        "User doesnt own or have enough tokens for this property",
+        {
+          status: 400,
+        }
+      );
     }
 
     if (tokenToSplit[0].numberOfTokens < tokens) {
