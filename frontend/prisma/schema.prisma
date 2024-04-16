@@ -7,40 +7,44 @@ generator client {
   provider        = "prisma-client-js"
 }
 
-model Account {
-  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId             String  @db.ObjectId
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  
-  access_token       String?  
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken String   @unique
-  userId       String   @db.ObjectId
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model User {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  username       String?
-  email          String?   @unique
-  hashedPassword String?
-  emailVerified  Boolean?
-  avatar         String?
-  accounts      Account[]
-  sessions      Session[]
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  username        String?
+  email           String?    @unique
+  hashedPassword  String?
+  emailVerified   Boolean?
+  avatar          String?
+  tokens          Token[]
+}
+
+model Property {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  country          String
+  state            String
+  city             String
+  street1          String
+  street2          String
+  zip              String
+  year             Int
+  propType         String
+  propSubtype      String
+  size             Int
+  value            Int
+  income           Int
+  expense          Int
+  tokens           Token[]
+  tokensMinted     Int
+  tokensforSale    Int?
+  images           Int
+}
+
+model Token {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  property        Property  @relation(fields: [propertyId], references: [id])
+  propertyId      String    @db.ObjectId
+  user            User      @relation(fields: [userId], references: [id])
+  userId          String    @db.ObjectId
+  numberOfTokens  Int
+  listed          Boolean?
+  dateListed      DateTime?
 }
