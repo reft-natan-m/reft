@@ -24,6 +24,10 @@ async function main() {
   const propertyValueInEthereum = 1;
   const propertyValueInWei = ethers.parseEther(propertyValueInEthereum.toString());
   const tokensToMint = 100;
+  const feePercentage = 0.0001;
+  const totalPropertyCost = propertyValueInEthereum * tokensToMint;
+  const fee = totalPropertyCost * feePercentage;
+  const feeInWei = ethers.parseEther(fee.toString());
   const uri = "www.example.com/api/property/1";
 
   console.log(`Minting ${tokensToMint} tokens for property ${propertyId} to ${second.address}`);
@@ -66,7 +70,9 @@ async function main() {
     `Signer #2 Property #${propertyId} Tokens:  ${await reft.balanceOf(second.address, propertyId)}`
   );
 
-  await secondSignerReftInstance.listTokenForSale(saleId, propertyId, amountOfTokensToSell);
+  await secondSignerReftInstance.listTokenForSale(saleId, propertyId, amountOfTokensToSell, {
+    value: feeInWei,
+  });
 
   console.log(`Sale #${saleId} Listed`);
 
@@ -98,7 +104,7 @@ async function main() {
   );
 
   await thirdSingerReftInstance.buyTokens(saleId, {
-    value: propertyValueInWei,
+    value: propertyValueInWei + feeInWei,
   });
 
   console.log(`Signer #3 bought ${amountOfTokensToSell} tokens`);
@@ -131,7 +137,9 @@ async function main() {
     `Signer #2 Property #${propertyId} Tokens:  ${await reft.balanceOf(second.address, propertyId)}`
   );
 
-  await secondSignerReftInstance.listTokenForSale(otherSaleId, propertyId, amountOfTokensToSell);
+  await secondSignerReftInstance.listTokenForSale(otherSaleId, propertyId, amountOfTokensToSell, {
+    value: feeInWei,
+  });
 
   console.log(`Sale #${otherSaleId} Listed`);
 

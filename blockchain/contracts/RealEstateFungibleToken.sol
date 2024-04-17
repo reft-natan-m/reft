@@ -4,13 +4,19 @@ pragma solidity ^0.8.0;
 // import {console} from "hardhat/console.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {ERC1155Holder} from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import {IERC1155MetadataURI} from "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
 
-contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
+contract RealEstateFungibleToken is
+    ERC1155,
+    ReentrancyGuard,
+    ERC1155Holder,
+    Ownable
+{
     using Math for uint256;
 
     /**
@@ -18,11 +24,13 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @param metadataURI The metadata URI for the property.
      * @param totalTokens The total number of tokens that have been minted for the property.
      * @param pricePerTokenInWei The price per token in Wei.
+     * @param fee The fee charged on the total price of the property. Used when listing or buying tokens.
      */
     struct Property {
         string metadataURI;
         uint256 totalTokens;
         uint256 pricePerTokenInWei;
+        uint256 fee;
     }
 
     /**
@@ -62,7 +70,7 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
     );
     event TokensDelisted(uint256 indexed saleId, uint256 indexed propertyId);
 
-    constructor() ERC1155("") {}
+    constructor() ERC1155("") Ownable(msg.sender) {}
 
     /**
      * @dev Override the supportsInterface function to add support for the IERC1155MetadataURI interface.
@@ -99,6 +107,14 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
     }
 
     /**
+     * @dev return the fee for a given property.
+     * @param propertyId The property id.
+     */
+    function getFee(uint256 propertyId) external view returns (uint256) {
+        return properties[propertyId].fee;
+    }
+
+    /**
      * @dev return the total supply of tokens for a given property.
      * @param propertyId The property id.
      */
@@ -118,31 +134,43 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
      * @dev Function to mint tokens for a new property.
      * @param to The address that will receive the tokens.
      * @param propertyId The property ID.
-     * @param amountOfTokens The amount of tokens to mint.
+     * @param totalTokens The amount of tokens to mint.
      * @param metadataURI The metadata URI for the token.
      */
     function mint(
         address to,
         uint256 propertyId,
-        uint256 amountOfTokens,
+        uint256 totalTokens,
         uint256 pricePerTokenInWei,
         string memory metadataURI
-    ) external {
+    ) public {
         require(
             properties[propertyId].totalTokens == 0,
             "Property was previously tokenized."
         );
+        // Calculate the total price of the property
+        (bool totalOverflow, uint256 totalPrice) = pricePerTokenInWei.tryMul(
+            totalTokens
+        );
+        require(totalOverflow, "Property Value Overflow.");
+
+        // Calculate the fee, should be .01% of the total price
+        (bool zeroFlag, uint256 fee) = totalPrice.tryDiv(10000);
+        require(zeroFlag, "Cannot divide by zero.");
+
         properties[propertyId] = Property(
             metadataURI,
-            amountOfTokens,
-            pricePerTokenInWei
+            totalTokens,
+            pricePerTokenInWei,
+            fee
         );
-        _mint(to, propertyId, amountOfTokens, "");
-        emit PropertyTokenized(propertyId, to, amountOfTokens);
+        _mint(to, propertyId, totalTokens, "");
+        emit PropertyTokenized(propertyId, to, totalTokens);
     }
 
     /** @dev Function to allow a user to list their tokens for sale, transferring them to the contract for escrow.
-     *  @param saleId The sale ID.
+     * A fee is charged on the total price of the property.
+     * @param saleId The sale ID.
      * @param propertyId The property ID.
      * @param amountOfTokens The amount of tokens to list for sale.
      */
@@ -150,11 +178,9 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         uint256 saleId,
         uint256 propertyId,
         uint256 amountOfTokens
-    ) external {
-        require(
-            properties[propertyId].totalTokens > 0,
-            "Property has not been tokenized."
-        );
+    ) public payable {
+        Property memory property = properties[propertyId];
+        require(property.totalTokens > 0, "Property has not been tokenized.");
         require(
             balanceOf(msg.sender, propertyId) >= amountOfTokens,
             "Insufficient property token balance."
@@ -163,6 +189,9 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             tokensForSale[saleId].amountOfTokens == 0,
             "Sale ID already exists."
         );
+
+        require(msg.value >= property.fee, "Insufficient fee payment.");
+        require(msg.value <= property.fee, "Excess fee payment.");
 
         tokensForSale[saleId] = TokenSale(
             msg.sender,
@@ -178,7 +207,32 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             ""
         );
 
+        payable(owner()).transfer(msg.value);
+
         emit TokensListed(saleId, propertyId, msg.sender, amountOfTokens);
+    }
+
+    /**
+     * @dev Function to mint and list tokens for sale in one transaction.
+     * @param to The address that will receive the tokens.
+     * @param propertyId The property ID.
+     * @param totalTokens The amount of tokens to mint
+     * @param pricePerTokenInWei The price per token in Wei.
+     * @param metadataURI The metadata URI for the token.
+     * @param saleId The sale ID.
+     * @param amountOfTokens The amount of tokens to list for sale.
+     */
+    function mintAndListTokenForSale(
+        address to,
+        uint256 propertyId,
+        uint256 totalTokens,
+        uint256 pricePerTokenInWei,
+        string memory metadataURI,
+        uint256 saleId,
+        uint256 amountOfTokens
+    ) external payable {
+        mint(to, propertyId, totalTokens, pricePerTokenInWei, metadataURI);
+        listTokenForSale(saleId, propertyId, amountOfTokens);
     }
 
     /**
@@ -222,16 +276,21 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
         require(sale.amountOfTokens > 0, "Sale ID does not exist.");
 
         Property memory property = properties[sale.propertyId];
-        (bool priceOverflow, uint256 price) = property
+        (bool tokenPriceOverflow, uint256 tokenPrice) = property
             .pricePerTokenInWei
             .tryMul(sale.amountOfTokens);
-        require(priceOverflow, "Price overflow.");
+        //? this should never happen, we check for this kind of overflow in the mint function
+        //? we also check in the setPricePerTokenInWei function
+        require(tokenPriceOverflow, "Price overflow.");
 
-        require(msg.value >= price, "Insufficient payment.");
-        require(msg.value <= price, "Excess payment.");
+        (bool totalOverflow, uint256 totalPrice) = tokenPrice.tryAdd(
+            property.fee
+        );
+        //? it is very unlikely that this will happen, but it is possible, so we check for it
+        require(totalOverflow, "Total price overflow.");
 
-        // Transfer Ether from buyer to seller
-        payable(sale.seller).transfer(msg.value);
+        require(msg.value >= totalPrice, "Insufficient payment.");
+        require(msg.value <= totalPrice, "Excess payment.");
 
         /**
          * Transfer tokens to the buyer from the contract
@@ -245,6 +304,12 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             sale.amountOfTokens,
             ""
         );
+
+        // Transfer Ether from buyer to seller
+        payable(sale.seller).transfer(tokenPrice);
+
+        // Transfer fee to owner
+        payable(owner()).transfer(property.fee);
 
         // Delete the sale
         delete tokensForSale[saleId];
@@ -287,5 +352,17 @@ contract RealEstateFungibleToken is ERC1155, ReentrancyGuard, ERC1155Holder {
             "Property has not been tokenized."
         );
         properties[propertyId].pricePerTokenInWei = pricePerTokenInWei;
+
+        // Calculate the total price of the property
+        (bool totalOverflow, uint256 totalPrice) = pricePerTokenInWei.tryMul(
+            properties[propertyId].totalTokens
+        );
+        require(totalOverflow, "Property Value Overflow.");
+
+        // Calculate the fee
+        (bool zeroFlag, uint256 fee) = totalPrice.tryDiv(10000);
+        require(zeroFlag, "Cannot divide by zero.");
+
+        properties[propertyId].fee = fee;
     }
 }
