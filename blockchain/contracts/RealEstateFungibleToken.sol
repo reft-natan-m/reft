@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// import {console} from "hardhat/console.sol";
+import {console} from "hardhat/console.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -349,8 +349,6 @@ contract RealEstateFungibleToken is
         uint256 totalPrice = 0;
         uint256 index = 0;
         TokenListing[] storage tokenListings = listings[propertyId];
-        address[] memory sellers;
-        uint256[] memory tokenAmountsBought;
 
         while (remaining > 0 && index < tokenListings.length) {
             TokenListing storage tokenListing = tokenListings[index];
@@ -369,6 +367,15 @@ contract RealEstateFungibleToken is
                     ""
                 );
                 payable(tokenListing.seller).transfer(tokenPrice);
+
+                TokenPurchase memory purchase = TokenPurchase(
+                    msg.sender,
+                    tokenListing.seller,
+                    propertyId,
+                    taking
+                );
+
+                emit TokensBought(purchase);
 
                 // if the listing is empty, remove it
                 if (tokenListing.tokensListed == 0) {
@@ -394,15 +401,6 @@ contract RealEstateFungibleToken is
         require(remaining == 0, "Not enough tokens available for sale.");
         require(msg.value == totalPrice, "Incorrect payment amount.");
         payable(owner()).transfer(properties[propertyId].fee);
-
-        TokenPurchase memory purchase = TokenPurchase(
-            msg.sender,
-            msg.sender,
-            propertyId,
-            amountToBuy
-        );
-
-        emit TokensBought(purchase);
     }
 
     /**
