@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { userId, tokensToList, ...propertyData } = body;
+  const { userId, tokenToList, ...propertyData } = body;
 
   try {
     const user = await prisma.user.findUnique({
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         userId: userId,
         propertyId: property.id,
-        tokens: tokensToList,
+        tokens: tokenToList,
       }),
     });
 

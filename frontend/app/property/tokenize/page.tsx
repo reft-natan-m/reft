@@ -4,11 +4,18 @@ import { useRouter } from "next/navigation";
 import Stepper from "@/app/ui/Stepper";
 import TokenizeStart from "@/app/ui/TokenizeStart";
 import PropertyForm from "@/app/ui/PropertyForm";
-import OwnershipForm from "@/app/ui/OwnershipForm";
+// import OwnershipForm from "@/app/ui/OwnershipForm";
 import FinancialForm from "@/app/ui/FinancialForm";
 import TokenizeForm from "@/app/ui/TokenizationForm";
 import MiscForm from "@/app/ui/MiscForm";
 import TokenizeEnd from "@/app/ui/TokenizeEnd";
+import { useSession } from "next-auth/react";
+import { UserSession } from "@/app/api/auth/[...nextauth]/route";
+
+interface NewFormData {
+  propertyId: string;
+  images: FileList | null;
+}
 
 export interface FormData {
   country: string;
@@ -26,10 +33,13 @@ export interface FormData {
   expense: number;
   tokens: number;
   tokenToList: number;
-  images: number;
+  images: FileList | null;
 }
 
 const Tokenize = () => {
+  const { data: session } = useSession();
+  const userSession = session?.user as UserSession;
+
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [formData, setFormData] = useState<FormData>({
@@ -48,7 +58,7 @@ const Tokenize = () => {
     expense: 0,
     tokens: 100,
     tokenToList: 0,
-    images: 0,
+    images: null,
   });
 
   const prevStep = () => {
@@ -67,26 +77,67 @@ const Tokenize = () => {
   };
 
   const handleSubmitAllForms = async () => {
-    console.log("Data:", formData);
-    router.refresh();
-    router.push("/");
-    // try {
-    //   const response = await fetch("/api/tokenize", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
-    //   if (response.ok) {
-    //     router.refresh();
-    //     router.push("/");
-    //   } else {
-    //     // Handle error if form submission fails
-    //   }
-    // } catch (error) {
-    //   // Handle network error or other exceptions
-    // }
+    let propertyData;
+    let newFormData: NewFormData;
+
+    const postData = {
+      country: formData.country,
+      state: formData.state,
+      city: formData.city,
+      street1: formData.street1,
+      street2: formData.street2,
+      zip: formData.zip,
+      year: +formData.year,
+      propType: formData.propType,
+      propSubtype: formData.propSubtype,
+      size: +formData.size,
+      value: +formData.value,
+      income: +formData.income,
+      expense: +formData.expense,
+      tokensMinted: formData.tokens,
+      tokenToList: +formData.tokenToList,
+      userId: userSession.id,
+    };
+    try {
+      const res = await fetch("/api/property/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+      if (res.ok) {
+        propertyData = await res.json();
+        console.log("data: ", propertyData);
+        newFormData = {
+          propertyId: propertyData.id,
+          images: formData.images,
+        };
+        console.log(newFormData);
+        const uploadRes = await fetch("/api/property/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newFormData),
+        });
+
+        if (uploadRes.ok) {
+          // Handle success
+          console.log("Upload successful");
+        } else {
+          // Handle error
+          console.error("Upload failed");
+        }
+
+        router.refresh();
+        router.push("/");
+      } else {
+        alert("shit went wrong");
+      }
+    } catch (error) {
+      // Handle network error or other exceptions
+    }
   };
 
   return (

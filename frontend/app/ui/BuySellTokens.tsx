@@ -1,12 +1,18 @@
 "use client";
 
 import { FloatingLabel, Button } from "flowbite-react";
+import { FormEventHandler } from "react";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { UserSession } from "../api/auth/[...nextauth]/route";
+import { Property } from "@prisma/client";
 
 interface BuySellTokensProps {
   setOpenModal: (openModal: boolean) => void;
   totalOption: number;
   tokenPrice: number;
+  data: Property;
+  buttonOption: Boolean;
 }
 
 const formatter = new Intl.NumberFormat("en-US", {
@@ -18,9 +24,30 @@ const BuySellTokens: React.FC<BuySellTokensProps> = ({
   setOpenModal,
   totalOption,
   tokenPrice,
+  data,
+  buttonOption,
 }) => {
+  const { data: session } = useSession();
+  const userSession = session?.user as UserSession;
   const [numberOfTokens, setNumberOfTokens] = useState<number>(1);
-  const handleSubmit = () => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    if (buttonOption) {
+      console.log("Insert buy logic here");
+    } else {
+      const formData = {
+        userId: userSession.id,
+        propertyId: data.id,
+        tokens: numberOfTokens,
+      };
+
+      const res = await fetch("/api/listing/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+    }
     setOpenModal(false);
   };
   const handleTokenChange = (event: React.ChangeEvent<HTMLInputElement>) => {

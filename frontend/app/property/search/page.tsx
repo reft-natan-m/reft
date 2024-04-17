@@ -28,7 +28,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
     year: 1900 + (index + 1),
     value: 500000 + (index + 1) * 10000,
     tokens: 100 + index,
-    tokenForSale: 10 + index,
+    tokenToList: 10 + index,
     tokenPrice: (500000 + (index + 1) * 10000) / (100 + index),
     propType: "Residential",
     propSubtype: "Single Family",

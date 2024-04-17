@@ -23,7 +23,6 @@ import {
   RainbowKitProvider,
   darkTheme,
 } from "@rainbow-me/rainbowkit";
-import { FooterComp } from "./ui/Footer";
 
 const config = getDefaultConfig({
   appName: "RainbowKit App",
@@ -57,7 +56,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   <div className="flex flex-col h-screen max-h-screen">
                     <Nav />
                     <div className="flex-grow overflow-y-auto">{children}</div>
-                    <FooterComp />
                   </div>
                 </Providers>
               </RainbowKitProvider>

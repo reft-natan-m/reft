@@ -2,9 +2,10 @@ import React from "react";
 import { PropertyData, BuySellData } from "./CardData";
 import GalleryComp from "@/app/ui/GalleryComp";
 import BuySellButtons from "./BuySellButtons";
+import { Property } from "@prisma/client";
 
 interface PropertyDetailProps {
-  data: PropertyData;
+  data: Property;
 }
 
 const formatter = new Intl.NumberFormat("en-US", {
@@ -13,27 +14,19 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
-  const buySell: BuySellData = {
-    sellTotal: 10,
-    buyTotal: data.tokenToList,
-  };
-
   return (
     <div className="flex">
       <ul className="divide-y divide-gray-200 dark:divide-gray-700">
         <li>
           <div className="mb-4">
-            <GalleryComp data={data} />
+            <GalleryComp />
           </div>
         </li>
         <li>
           <div className="mt-4 mb-4">
             <div className="flex justify-between">
               <div className="order-2">
-                <BuySellButtons
-                  bsTotals={buySell}
-                  tokenPrice={data.tokenPrice}
-                />
+                <BuySellButtons data={data} />
               </div>
               <div className="flex flex-col justify-center">
                 <div className="flex justify-between">
@@ -52,13 +45,13 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
           <div className="flex flex-col mt-4 mb-4">
             <div className="grid grid-cols-3">
               <h5 className="text-start text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {data.tokenToList}
+                {data.tokensforSale}
               </h5>
               <h5 className="text-start text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {data.tokens}
+                {data.tokensMinted}
               </h5>
               <h5 className="text-start text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {formatter.format(data.tokenPrice)}
+                {formatter.format(data.value / data.tokensMinted)}
               </h5>
             </div>
             <div className="grid grid-cols-3">
@@ -83,7 +76,7 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
               {data.size} sqft
             </div>
             <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
-              {formatter.format(data.sizeValue)}/sqft
+              {formatter.format(data.value / data.size)}/sqft
             </div>
             <div className="flex justify-center items-center bg-gray-800 border-2 border-gray-400 text-center font-bold">
               Built in {data.year}

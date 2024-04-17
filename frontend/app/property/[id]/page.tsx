@@ -11,7 +11,7 @@ const page = () => {
     zip: `90000`,
     value: 500000,
     tokens: 100,
-    tokenForSale: 10,
+    tokenToList: 10,
     tokenPrice: 500000 / 100,
     image: "/images/Dunno.jpg",
     year: 1949,

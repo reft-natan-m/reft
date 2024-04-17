@@ -1,18 +1,14 @@
+import { Property } from "@prisma/client";
 import { Button } from "flowbite-react";
 import React, { useState } from "react";
 import BuySellTokens from "./BuySellTokens";
-import { BuySellData } from "./CardData";
 import ModalComp from "./ModalComp";
 
 interface BuySellButtonsProps {
-  bsTotals: BuySellData;
-  tokenPrice: number;
+  data: Property;
 }
 
-const BuySellButtons: React.FC<BuySellButtonsProps> = ({
-  bsTotals,
-  tokenPrice,
-}) => {
+const BuySellButtons: React.FC<BuySellButtonsProps> = ({ data }) => {
   const [openModal, setOpenModal] = useState(false);
   const [buttonOption, setButtonOption] = useState(false);
   const [modalHeader, setModalHeader] = useState("");
@@ -22,13 +18,17 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({
     setButtonOption(true);
     setOpenModal(true);
     setModalHeader("Buy Tokens");
-    setTotalOption(bsTotals.buyTotal);
+    if (data.tokensforSale) {
+      setTotalOption(data.tokensforSale);
+    } else {
+      setTotalOption(0);
+    }
   };
   const handleSell = () => {
     setButtonOption(false);
     setOpenModal(true);
     setModalHeader("Sell Tokens");
-    setTotalOption(bsTotals.sellTotal);
+    setTotalOption(10);
   };
 
   return (
@@ -45,7 +45,9 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({
               <BuySellTokens
                 setOpenModal={setOpenModal}
                 totalOption={totalOption}
-                tokenPrice={tokenPrice}
+                tokenPrice={data.value / data.tokensMinted}
+                data={data}
+                buttonOption={buttonOption}
               />
             </div>
           ) : (
@@ -53,7 +55,9 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({
               <BuySellTokens
                 setOpenModal={setOpenModal}
                 totalOption={totalOption}
-                tokenPrice={tokenPrice}
+                tokenPrice={data.value / data.tokensMinted}
+                data={data}
+                buttonOption={buttonOption}
               />
             </div>
           )}

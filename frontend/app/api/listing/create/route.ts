@@ -60,12 +60,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId },
+    });
+
     await prisma.property.update({
       where: {
         id: propertyId,
       },
       data: {
-        tokensforSale: { increment: tokens },
+        tokensforSale: property?.tokensforSale + tokens,
       },
     });
 

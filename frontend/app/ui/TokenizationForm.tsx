@@ -55,10 +55,10 @@ const TokenizeForm: React.FC<TokenizeFormProps> = ({
         </div>
         <TextInput
           id="sellnumber"
-          name="tokenSale"
+          name="tokenToList"
           type="number"
           placeholder="amount of tokens for sale"
-          value={formData.tokenSale}
+          value={formData.tokenToList}
           onChange={handleChange}
           required
           shadow
