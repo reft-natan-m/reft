@@ -77,7 +77,7 @@ contract RealEstateFungibleToken is
     // propertyId to an array of listings, stores all tokens for sale for a given property
     mapping(uint256 => TokenListing[]) public listings;
 
-    event PropertyTokenized(Property property, address indexed owner);
+    event TokensMinted(Property property, address indexed owner);
     event TokensBought(TokenPurchase purchase);
     event TokensListed(TokenListing listing);
     event TokensDelisted(TokenDelisting delisting);
@@ -199,7 +199,7 @@ contract RealEstateFungibleToken is
         properties[propertyId] = property;
 
         _mint(to, propertyId, totalTokens, "");
-        emit PropertyTokenized(property, to);
+        emit TokensMinted(property, to);
     }
 
     /** @dev Function to allow a user to list their tokens for sale, transferring them to the contract for escrow.
