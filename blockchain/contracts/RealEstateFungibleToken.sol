@@ -34,50 +34,60 @@ contract RealEstateFungibleToken is
     }
 
     /**
-     * @notice A struct to hold details of a token sale.
+     * @notice A struct to hold details of a token listing.
      * @param seller The address of the seller.
      * @param propertyId The property ID of the token
-     * @param amountOfTokens The amount of tokens for sale.
+     * @param tokensListed The amount of tokens listed for purhcase.
      */
-    struct TokenSale {
+    struct TokenListing {
         address seller;
         uint256 propertyId;
-        uint256 amountOfTokens;
+        uint256 tokensListed;
+    }
+
+    /**
+     * @notice A struct to hold details of a token delisting
+     * @param seller The address of the seller.
+     * @param propertyId The property ID of the token.
+     * @param tokensDelisted The amount of tokens to delist.
+     */
+    struct TokenDelisting {
+        address seller;
+        uint256 propertyId;
+        uint256 tokensDelisted;
+    }
+
+    /**
+     * @notice A struct to hold details of a token purchase
+     * @param buyer The address of the buyer.
+     * @param sellerTokensSold A mapping of seller addresses to the amount of tokens sold from that seller.
+     * @param propertyId The property ID of the token.
+     * @param tokensBoughtTotal The total amount of tokens bought.
+     */
+    struct TokenPurchase {
+        address buyer;
+        address seller;
+        uint256 propertyId;
+        uint256 tokensBought;
     }
 
     // propertyId => Property, stores all minted properties
     mapping(uint256 => Property) public properties;
 
-    // propertyId to list of sales, stores all tokens for sale for a given property
-    mapping(uint256 => TokenSale[]) public listings;
+    // propertyId to an array of listings, stores all tokens for sale for a given property
+    mapping(uint256 => TokenListing[]) public listings;
 
-    event PropertyTokenized(
-        uint256 indexed propertyId,
-        address indexed owner,
-        uint256 totalTokens
-    );
-    event TokensBought(
-        uint256 indexed propertyId,
-        address indexed from,
-        address indexed to,
-        uint256 amountBought
-    );
-    event TokensListed(
-        uint256 indexed propertyId,
-        address indexed seller,
-        uint256 amountListed
-    );
-    event TokensDelisted(
-        uint256 indexed propertyId,
-        address indexed seller,
-        uint256 amountDelisted
-    );
+    event PropertyTokenized(Property property, address indexed owner);
+    event TokensBought(TokenPurchase purchase);
+    event TokensListed(TokenListing listing);
+    event TokensDelisted(TokenDelisting delisting);
 
     constructor() ERC1155("") Ownable(msg.sender) {}
 
     /**
      * @dev Override the supportsInterface function to add support for the IERC1155MetadataURI interface.
      * @param interfaceId The interface ID.
+     * @return bool True if the contract supports the interface, false otherwise.
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -92,6 +102,7 @@ contract RealEstateFungibleToken is
     /**
      * @dev Override the uri function to return the metadata URI for a given property.
      * @param propertyId The property ID.
+     * @return string The metadata URI for the property.
      */
     function uri(
         uint256 propertyId
@@ -102,6 +113,7 @@ contract RealEstateFungibleToken is
     /**
      * @dev return the pricePerTokenInWei for a given property.
      * @param propertyId The property id.
+     * @return uint256 The price per token in Wei.
      */
     function getPricePerTokenInWei(
         uint256 propertyId
@@ -112,6 +124,7 @@ contract RealEstateFungibleToken is
     /**
      * @dev return the fee for a given property.
      * @param propertyId The property id.
+     * @return uint256 The fee for the property.
      */
     function getFee(uint256 propertyId) external view returns (uint256) {
         return properties[propertyId].fee;
@@ -120,19 +133,31 @@ contract RealEstateFungibleToken is
     /**
      * @dev return the total supply of tokens for a given property.
      * @param propertyId The property id.
+     * @return uint256 The total supply of tokens for the property.
      */
     function totalSupply(uint256 propertyId) external view returns (uint256) {
         return properties[propertyId].totalTokens;
     }
 
     /**
+     * @dev get all property details
+     * @param propertyId The property id.
+     * @return Property The property details.
+     */
+    function getProperty(
+        uint256 propertyId
+    ) external view returns (Property memory) {
+        return properties[propertyId];
+    }
+
+    /**
      * @dev Return all sales for a given property ID.
      * @param propertyId The property id.
-     * @return TokenSale[] An array of all token sales for the specified property.
+     * @return TokenListing[] An array of all token sales for the specified property.
      */
-    function getAllSalesForProperty(
+    function getAllListingsForProperty(
         uint256 propertyId
-    ) external view returns (TokenSale[] memory) {
+    ) external view returns (TokenListing[] memory) {
         return listings[propertyId];
     }
 
@@ -141,6 +166,7 @@ contract RealEstateFungibleToken is
      * @param to The address that will receive the tokens.
      * @param propertyId The property ID.
      * @param totalTokens The amount of tokens to mint.
+     * @param pricePerTokenInWei The price per token in Wei.
      * @param metadataURI The metadata URI for the token.
      */
     function mint(
@@ -164,31 +190,33 @@ contract RealEstateFungibleToken is
         (bool zeroFlag, uint256 fee) = totalPrice.tryDiv(10000);
         require(zeroFlag, "Cannot divide by zero.");
 
-        properties[propertyId] = Property(
+        Property memory property = Property(
             metadataURI,
             totalTokens,
             pricePerTokenInWei,
             fee
         );
+        properties[propertyId] = property;
+
         _mint(to, propertyId, totalTokens, "");
-        emit PropertyTokenized(propertyId, to, totalTokens);
+        emit PropertyTokenized(property, to);
     }
 
     /** @dev Function to allow a user to list their tokens for sale, transferring them to the contract for escrow.
      * A fee is charged on the total price of the property.
      * @param propertyId The property ID.
-     * @param amountOfTokens The amount of tokens to list for sale.
+     * @param amountToList The amount of tokens to list for sale.
      */
     function listTokenForSale(
         uint256 propertyId,
-        uint256 amountOfTokens
+        uint256 amountToList
     ) public payable {
         require(
             properties[propertyId].totalTokens > 0,
             "Property has not been tokenized."
         );
         require(
-            balanceOf(msg.sender, propertyId) >= amountOfTokens,
+            balanceOf(msg.sender, propertyId) >= amountToList,
             "Insufficient property token balance."
         );
         require(
@@ -196,18 +224,23 @@ contract RealEstateFungibleToken is
             "Incorrect fee amount."
         );
 
-        listings[propertyId].push(
-            TokenSale(msg.sender, propertyId, amountOfTokens)
+        TokenListing memory listing = TokenListing(
+            msg.sender,
+            propertyId,
+            amountToList
         );
+
+        listings[propertyId].push(listing);
+
         safeTransferFrom(
             msg.sender,
             address(this),
             propertyId,
-            amountOfTokens,
+            amountToList,
             ""
         );
         payable(owner()).transfer(msg.value);
-        emit TokensListed(propertyId, msg.sender, amountOfTokens);
+        emit TokensListed(listing);
     }
 
     /**
@@ -217,7 +250,7 @@ contract RealEstateFungibleToken is
      * @param totalTokens The amount of tokens to mint
      * @param pricePerTokenInWei The price per token in Wei.
      * @param metadataURI The metadata URI for the token.
-     * @param amountOfTokens The amount of tokens to list for sale.
+     * @param amountToList The amount of tokens to list for sale.
      */
     function mintAndListTokenForSale(
         address to,
@@ -225,10 +258,10 @@ contract RealEstateFungibleToken is
         uint256 totalTokens,
         uint256 pricePerTokenInWei,
         string memory metadataURI,
-        uint256 amountOfTokens
+        uint256 amountToList
     ) external payable {
         mint(to, propertyId, totalTokens, pricePerTokenInWei, metadataURI);
-        listTokenForSale(propertyId, amountOfTokens);
+        listTokenForSale(propertyId, amountToList);
     }
 
     /**
@@ -242,30 +275,51 @@ contract RealEstateFungibleToken is
     ) external {
         require(amountToDelist > 0, "Cannot delist zero tokens.");
         uint256 remaining = amountToDelist;
-        TokenSale[] storage sales = listings[propertyId];
+        TokenListing[] storage tokenListings = listings[propertyId];
         uint256 index = 0;
 
-        while (remaining > 0 && index < sales.length) {
-            TokenSale storage sale = sales[index];
-            if (sale.seller == msg.sender && sale.amountOfTokens > 0) {
-                uint256 delisting = Math.min(remaining, sale.amountOfTokens);
-                remaining -= delisting;
-                sale.amountOfTokens -= delisting;
+        while (remaining > 0 && index < tokenListings.length) {
+            // get the current property listing
+            TokenListing storage tokenListing = tokenListings[index];
+
+            // only delist tokens from listings the seller made
+            if (
+                tokenListing.seller == msg.sender &&
+                tokenListing.tokensListed > 0
+            ) {
+                // update the amount of tokens listed
+                uint256 amountToDelistFromCurrentListing = Math.min(
+                    remaining,
+                    tokenListing.tokensListed
+                );
+                remaining -= amountToDelistFromCurrentListing;
+                tokenListing.tokensListed -= amountToDelistFromCurrentListing;
+
+                //transfer the tokens back to the seller
                 this.safeTransferFrom(
                     address(this),
                     msg.sender,
                     propertyId,
-                    delisting,
+                    amountToDelistFromCurrentListing,
                     ""
                 );
-                emit TokensDelisted(propertyId, msg.sender, delisting);
-                if (sale.amountOfTokens == 0) {
-                    sales[index] = sales[sales.length - 1]; // Remove the empty sale
-                    sales.pop();
+
+                // if the listing is empty, remove it
+                if (tokenListing.tokensListed == 0) {
+                    // Shift all elements to the left to maintain order and remove the current sale
+                    for (uint256 i = index; i < tokenListings.length - 1; i++) {
+                        tokenListings[i] = tokenListings[i + 1];
+                    }
+
+                    // Remove the last element after shifting
+                    tokenListings.pop();
+                } else {
+                    // the listing is not empty, check while loop conditions again for the same index
+                    continue;
                 }
-            }
-            if (sale.amountOfTokens > 0 || sale.seller != msg.sender) {
-                ++index; // Only increment index if we didn't remove the current sale
+            } else {
+                // Move to the next sale if the current sale is not the seller's
+                index++;
             }
         }
 
@@ -273,6 +327,12 @@ contract RealEstateFungibleToken is
             remaining == 0,
             "Not enough tokens listed to delist the requested amount."
         );
+        TokenDelisting memory delisting = TokenDelisting(
+            msg.sender,
+            propertyId,
+            amountToDelist
+        );
+        emit TokensDelisted(delisting);
     }
 
     /**
@@ -288,16 +348,19 @@ contract RealEstateFungibleToken is
         uint256 remaining = amountToBuy;
         uint256 totalPrice = 0;
         uint256 index = 0;
-        TokenSale[] storage sales = listings[propertyId];
-        while (remaining > 0 && index < sales.length) {
-            TokenSale storage sale = sales[index];
-            if (sale.amountOfTokens > 0) {
-                uint256 taking = Math.min(remaining, sale.amountOfTokens);
+        TokenListing[] storage tokenListings = listings[propertyId];
+        address[] memory sellers;
+        uint256[] memory tokenAmountsBought;
+
+        while (remaining > 0 && index < tokenListings.length) {
+            TokenListing storage tokenListing = tokenListings[index];
+            if (tokenListing.tokensListed > 0) {
+                uint256 taking = Math.min(remaining, tokenListing.tokensListed);
                 uint256 tokenPrice = properties[propertyId].pricePerTokenInWei *
                     taking;
-                totalPrice += tokenPrice + properties[propertyId].fee;
+                totalPrice += tokenPrice;
                 remaining -= taking;
-                sale.amountOfTokens -= taking;
+                tokenListing.tokensListed -= taking;
                 this.safeTransferFrom(
                     address(this),
                     msg.sender,
@@ -305,20 +368,41 @@ contract RealEstateFungibleToken is
                     taking,
                     ""
                 );
-                payable(sale.seller).transfer(tokenPrice);
-            }
-            if (sale.amountOfTokens == 0) {
-                sales[index] = sales[sales.length - 1]; // Remove the empty sale
-                sales.pop();
+                payable(tokenListing.seller).transfer(tokenPrice);
+
+                // if the listing is empty, remove it
+                if (tokenListing.tokensListed == 0) {
+                    // Shift all elements to the left to maintain order and remove the current sale
+                    for (uint256 i = index; i < tokenListings.length - 1; i++) {
+                        tokenListings[i] = tokenListings[i + 1];
+                    }
+
+                    // Remove the last element after shifting
+                    tokenListings.pop();
+                } else {
+                    // the listing is not empty, check while loop conditions again for the same index
+                    continue;
+                }
             } else {
-                ++index;
+                // Move to the next sale if the current sale is not the seller's
+                index++;
             }
         }
+
+        totalPrice += properties[propertyId].fee;
 
         require(remaining == 0, "Not enough tokens available for sale.");
         require(msg.value == totalPrice, "Incorrect payment amount.");
         payable(owner()).transfer(properties[propertyId].fee);
-        emit TokensBought(propertyId, address(this), msg.sender, amountToBuy);
+
+        TokenPurchase memory purchase = TokenPurchase(
+            msg.sender,
+            msg.sender,
+            propertyId,
+            amountToBuy
+        );
+
+        emit TokensBought(purchase);
     }
 
     /**
@@ -330,11 +414,9 @@ contract RealEstateFungibleToken is
         uint256 propertyId,
         string memory metadataURI
     ) external {
-        require(
-            properties[propertyId].totalTokens > 0,
-            "Property has not been tokenized."
-        );
-        properties[propertyId].metadataURI = metadataURI;
+        Property storage property = properties[propertyId];
+        require(property.totalTokens > 0, "Property has not been tokenized.");
+        property.metadataURI = metadataURI;
     }
 
     /**
@@ -346,15 +428,13 @@ contract RealEstateFungibleToken is
         uint256 propertyId,
         uint256 pricePerTokenInWei
     ) external {
-        require(
-            properties[propertyId].totalTokens > 0,
-            "Property has not been tokenized."
-        );
-        properties[propertyId].pricePerTokenInWei = pricePerTokenInWei;
+        Property storage property = properties[propertyId];
+        require(property.totalTokens > 0, "Property has not been tokenized.");
+        property.pricePerTokenInWei = pricePerTokenInWei;
 
         // Calculate the total price of the property
         (bool totalOverflow, uint256 totalPrice) = pricePerTokenInWei.tryMul(
-            properties[propertyId].totalTokens
+            property.totalTokens
         );
         require(totalOverflow, "Property Value Overflow.");
 
@@ -362,6 +442,6 @@ contract RealEstateFungibleToken is
         (bool zeroFlag, uint256 fee) = totalPrice.tryDiv(10000);
         require(zeroFlag, "Cannot divide by zero.");
 
-        properties[propertyId].fee = fee;
+        property.fee = fee;
     }
 }
