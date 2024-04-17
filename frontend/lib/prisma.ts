@@ -1,12 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 
-let prisma: PrismaClient;
+class PrismaSingleton {
+  private static prismaInstance: PrismaClient;
 
-const getPrismaClient = () => {
-  if (!prisma) {
-    prisma = new PrismaClient();
+  private constructor() {} // Prevents instantiation
+
+  public static getInstance(): PrismaClient {
+    if (!this.prismaInstance) {
+      this.prismaInstance = new PrismaClient();
+    }
+    return this.prismaInstance;
   }
-  return prisma;
-};
+}
 
-export default getPrismaClient();
+let prisma = PrismaSingleton.getInstance();
+
+export default prisma;

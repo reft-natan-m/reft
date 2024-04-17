@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { userId, ...propertyData } = body;
+  const { userId, tokensToList, ...propertyData } = body;
 
   try {
     const user = await prisma.user.findUnique({
@@ -25,6 +25,24 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    const response = await fetch("http://localhost:3000/api/listing/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: userId,
+        propertyId: property.id,
+        tokens: tokensToList,
+      }),
+    });
+
+    if (!response.ok) {
+      return new NextResponse("Failed to list tokens for new property", {
+        status: 404,
+      });
+    }
 
     return NextResponse.json(property);
   } catch (error) {
