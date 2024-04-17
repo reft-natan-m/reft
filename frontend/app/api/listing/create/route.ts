@@ -5,6 +5,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { userId, propertyId, tokens } = body;
 
+  console.log("userID:", userId, "PropertyId:", propertyId, "Tokens:", tokens);
   try {
     const prismaUser = await prisma.user.findUnique({
       where: { id: userId },
@@ -15,13 +16,19 @@ export async function POST(req: NextRequest) {
       return new NextResponse("User doesnt exist", { status: 400 });
     }
 
+    console.log(prismaUser);
+
     const tokenToSplit = prismaUser.tokens.map((token) => {
       if (token.propertyId === propertyId && token.listed === (false || null)) {
-        return token;
+        if (token) {
+          return token;
+        }
       }
     });
 
-    if (!tokenToSplit[0]) {
+    const token = tokenToSplit.filter((value) => value !== undefined);
+
+    if (!token[0]) {
       return new NextResponse(
         "User doesnt own or have enough tokens for this property",
         {
@@ -30,7 +37,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (tokenToSplit[0].numberOfTokens < tokens) {
+    if (token[0].numberOfTokens < tokens) {
       return new NextResponse("User doesnt own enough tokens", { status: 400 });
     }
 
@@ -46,10 +53,10 @@ export async function POST(req: NextRequest) {
 
     await prisma.token.update({
       where: {
-        id: tokenToSplit[0].id,
+        id: token[0].id,
       },
       data: {
-        numberOfTokens: tokenToSplit[0].numberOfTokens - tokens,
+        numberOfTokens: token[0].numberOfTokens - tokens,
       },
     });
 
