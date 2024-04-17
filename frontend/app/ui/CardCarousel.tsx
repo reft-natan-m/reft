@@ -58,7 +58,7 @@ const CardCarousel: React.FC = () => {
 
   return (
     <div>
-      <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:mb-6 sm:text-2xl">
+      <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:text-2xl">
         Real Estate Near You.
       </h3>
       <div className="w-full h-screen overflow-hidden flex items-center justify-center">

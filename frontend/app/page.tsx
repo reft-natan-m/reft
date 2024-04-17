@@ -2,13 +2,14 @@
 
 import { useSession } from "next-auth/react";
 import CardCarousel from "./ui/CardCarousel";
-import { Feature } from "./ui/Features";
+import Feature from "./ui/Features";
+import { UserSession } from "./api/auth/[...nextauth]/route";
 import SearchBar from "./ui/SearchBar";
 
 const Home = () => {
-  // const { data: session, status } = useSession();
-
-  // console.log(session);
+  const { data: session, status } = useSession();
+  const userSession = session?.user as UserSession;
+  //console.log(userSession.id);
   // console.log(status);
 
   return (
@@ -16,7 +17,7 @@ const Home = () => {
       <SearchBar />
       <CardCarousel />
       <div className="bg-gray-100 dark:bg-secondary">
-        <Feature />
+        <Feature userSession={userSession} />
       </div>
     </div>
   );

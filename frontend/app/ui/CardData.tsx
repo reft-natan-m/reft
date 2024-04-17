@@ -21,14 +21,11 @@ export interface PropertyData {
   year: number;
   value: number;
   tokens: number;
-  tokenForSale: number;
+  tokenToList: number;
   tokenPrice: number;
   propType: string;
   propSubtype: string;
   size: number;
-  owners: string;
-  ownPercent: string;
-  entity: string;
   income: number;
   expense: number;
   image: string;

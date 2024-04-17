@@ -21,14 +21,11 @@ export interface FormData {
   propType: string;
   propSubtype: string;
   size: number;
-  owners: string;
-  ownPercent: string;
-  entity: string;
   value: number;
   income: number;
   expense: number;
   tokens: number;
-  tokenSale: number;
+  tokenToList: number;
   images: number;
 }
 
@@ -46,14 +43,11 @@ const Tokenize = () => {
     propType: "",
     propSubtype: "",
     size: 0,
-    owners: "",
-    ownPercent: "",
-    entity: "Individual",
     value: 0,
     income: 0,
     expense: 0,
     tokens: 100,
-    tokenSale: 0,
+    tokenToList: 0,
     images: 0,
   });
 
@@ -110,15 +104,15 @@ const Tokenize = () => {
             formData={formData}
           />
         )}
-        {currentStep === 2 && (
+        {/* {currentStep === 2 && (
           <OwnershipForm
             nextStep={nextStep}
             prevStep={prevStep}
             handleSubmit={handleSubmit}
             formData={formData}
           />
-        )}
-        {currentStep === 3 && (
+        )} */}
+        {currentStep === 2 && (
           <FinancialForm
             nextStep={nextStep}
             prevStep={prevStep}
@@ -126,7 +120,7 @@ const Tokenize = () => {
             formData={formData}
           />
         )}
-        {currentStep === 4 && (
+        {currentStep === 3 && (
           <TokenizeForm
             nextStep={nextStep}
             prevStep={prevStep}
@@ -134,14 +128,14 @@ const Tokenize = () => {
             formData={formData}
           />
         )}
-        {currentStep === 5 && (
+        {currentStep === 4 && (
           <MiscForm
             nextStep={nextStep}
             prevStep={prevStep}
             handleSubmit={handleSubmit}
           />
         )}
-        {currentStep === 6 && (
+        {currentStep === 5 && (
           <TokenizeEnd
             prevStep={prevStep}
             handleSubmitAllForms={handleSubmitAllForms}

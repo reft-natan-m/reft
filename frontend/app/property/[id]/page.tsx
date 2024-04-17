@@ -21,9 +21,6 @@ const page = () => {
     expense: 1234,
     income: 12345,
     sizeValue: 500000 / 2100,
-    owners: "",
-    ownPercent: "",
-    entity: "",
   };
   return (
     <div className="flex justify-center items-center h-screen mt-4">

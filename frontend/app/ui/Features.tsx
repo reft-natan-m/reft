@@ -1,8 +1,13 @@
 import { Button } from "flowbite-react";
+import { UserSession } from "../api/auth/[...nextauth]/route";
 import Link from "next/link";
 import FeatureCard from "./FeatureCard";
 
-export const Feature = () => {
+interface FeatureProps {
+  userSession: UserSession | null;
+}
+
+const Feature: React.FC<FeatureProps> = ({ userSession }) => {
   return (
     <div className="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
       <div className="max-w-xl mb-10 md:mx-auto sm:text-center lg:max-w-2xl md:mb-12">
@@ -46,11 +51,14 @@ export const Feature = () => {
       </div>
       <div className="flex justify-center items-center mt-5">
         <Link href="/auth/signup">
-          <h3 className="text-xl font-semibold sm:text-center text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-500 sm:mb-6 sm:text-2xl ">
-            Signup Today!
-          </h3>
+          {!userSession && (
+            <h3 className="text-xl font-semibold sm:text-center text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-500 sm:mb-6 sm:text-2xl ">
+              Signup Today!
+            </h3>
+          )}
         </Link>
       </div>
     </div>
   );
 };
+export default Feature;

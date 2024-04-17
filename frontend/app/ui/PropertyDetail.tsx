@@ -15,7 +15,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
   const buySell: BuySellData = {
     sellTotal: 10,
-    buyTotal: data.tokenForSale,
+    buyTotal: data.tokenToList,
   };
 
   return (
@@ -52,7 +52,7 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
           <div className="flex flex-col mt-4 mb-4">
             <div className="grid grid-cols-3">
               <h5 className="text-start text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {data.tokenForSale}
+                {data.tokenToList}
               </h5>
               <h5 className="text-start text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                 {data.tokens}
