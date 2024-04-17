@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import CardCarousel from "./ui/CardCarousel";
+import { Feature } from "./ui/Features";
 import SearchBar from "./ui/SearchBar";
 
 const Home = () => {
@@ -13,10 +14,10 @@ const Home = () => {
   return (
     <div>
       <SearchBar />
-      <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:mb-6 sm:text-2xl">
-        Real Estate Near You.
-      </h3>
       <CardCarousel />
+      <div className="bg-gray-100 dark:bg-secondary">
+        <Feature />
+      </div>
     </div>
   );
 };
