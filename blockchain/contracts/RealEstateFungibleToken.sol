@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {console} from "hardhat/console.sol";
+// import {console} from "hardhat/console.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -269,7 +269,8 @@ contract RealEstateFungibleToken is
     }
 
     /**
-     * @dev Function to delist a specified number of tokens for a property. Tokens are delisted from the oldest listing made by the seller.
+     * @dev Function to delist a specified number of tokens for a property.
+     * Tokens are delisted from the oldest listing made by the seller.
      * @param propertyId The property ID.
      * @param amountToDelist The number of tokens the seller wants to delist.
      */
@@ -362,6 +363,7 @@ contract RealEstateFungibleToken is
         uint256 index = 0;
         TokenListing[] storage tokenListings = listings[propertyId];
 
+        // The remaining check is the main check, the index check is a failsafe
         while (remaining > 0 && index < tokenListings.length) {
             TokenListing storage tokenListing = tokenListings[index];
             if (tokenListing.tokensListed > 0) {
@@ -398,13 +400,21 @@ contract RealEstateFungibleToken is
 
                     // Remove the last element after shifting
                     tokenListings.pop();
+                    continue;
                 } else {
                     // the listing is not empty, check while loop conditions again for the same index
                     continue;
                 }
             } else {
-                // Move to the next sale if the current sale is not the seller's
-                index++;
+                // This is pretty much impossible to hit, but just in case
+                // Shift all elements to the left to maintain order and remove the current sale
+                for (uint256 i = index; i < tokenListings.length - 1; i++) {
+                    tokenListings[i] = tokenListings[i + 1];
+                }
+
+                // Remove the last element after shifting
+                tokenListings.pop();
+                continue;
             }
         }
 
