@@ -486,9 +486,10 @@ describe("RealEstateFungibleToken contract", function () {
       await realEstateFungibleToken.delistTokenForSale(propertyId, amountToDelist);
 
       const listings = await realEstateFungibleToken.getAllListingsForProperty(propertyId);
+      console.log(listings);
       expect(listings.length).to.equal(2);
-      expect(listings[1].tokensListed).to.equal(2n);
-      expect(listings[2].tokensListed).to.equal(3n);
+      expect(listings[0].tokensListed).to.equal(2n);
+      expect(listings[1].tokensListed).to.equal(3n);
     });
 
     it("Should prevent delisting tokens for property ids that don't exist", async function () {
@@ -543,118 +544,221 @@ describe("RealEstateFungibleToken contract", function () {
     });
   });
 
-  // describe("Buying Tokens", function () {
-  //   it("Should allow buying tokens", async function () {
-  //     const {
-  //       realEstateFungibleToken,
-  //       signers: { owner, second },
-  //       listings: [listing1, listing2, listing3],
-  //       property: { pricePerTokenInWei, feeInWei },
-  //     } = await loadFixture(listTokensFixture);
+  describe("Buying Tokens", function () {
+    it("Should allow buying tokens", async function () {
+      const {
+        realEstateFungibleToken,
+        signers: { owner, second },
+        listings: [listing1, listing2, listing3],
+        property: { pricePerTokenInWei, feeInWei, propertyId },
+      } = await loadFixture(listTokensFixture);
 
-  //     const salePrice = pricePerTokenInWei * BigInt(amountOfTokensToSell) + feeInWei;
+      const amountOfTokensToBuy = 1;
 
-  //     expect(await realEstateFungibleToken.balanceOf(owner.address, propertyId)).to.equal(99);
-  //     expect(
-  //       await realEstateFungibleToken.balanceOf(
-  //         await realEstateFungibleToken.getAddress(),
-  //         propertyId
-  //       )
-  //     ).to.equal(1);
-  //     expect(await realEstateFungibleToken.balanceOf(second.address, propertyId)).to.equal(0);
+      expect(await realEstateFungibleToken.balanceOf(owner.address, propertyId)).to.equal(94);
+      expect(
+        await realEstateFungibleToken.balanceOf(
+          await realEstateFungibleToken.getAddress(),
+          propertyId
+        )
+      ).to.equal(6);
+      expect(await realEstateFungibleToken.balanceOf(second.address, propertyId)).to.equal(0);
 
-  //     const ownerWeiBalance = await owner.provider.getBalance(owner.address);
+      const ownerWeiBalance = await owner.provider.getBalance(owner.address);
 
-  //     await expect(
-  //       realEstateFungibleToken.connect(second).buyTokens(saleId, {
-  //         value: salePrice,
-  //       })
-  //     )
-  //       .to.emit(realEstateFungibleToken, "TokensBought")
-  //       .withArgs(propertyId, owner.address, second.address, amountOfTokensToSell);
+      const salePrice = pricePerTokenInWei * BigInt(amountOfTokensToBuy) + feeInWei;
+      await expect(
+        realEstateFungibleToken.connect(second).buyTokens(propertyId, amountOfTokensToBuy, {
+          value: salePrice,
+        })
+      )
+        .to.emit(realEstateFungibleToken, "TokensBought")
+        .withArgs([second.address, owner.address, propertyId, amountOfTokensToBuy]);
 
-  //     expect(await realEstateFungibleToken.balanceOf(owner.address, propertyId)).to.equal(99);
-  //     expect(
-  //       await realEstateFungibleToken.balanceOf(
-  //         await realEstateFungibleToken.getAddress(),
-  //         propertyId
-  //       )
-  //     ).to.equal(0);
-  //     expect(await realEstateFungibleToken.balanceOf(second.address, propertyId)).to.equal(1);
+      expect(await realEstateFungibleToken.balanceOf(owner.address, propertyId)).to.equal(94);
+      expect(
+        await realEstateFungibleToken.balanceOf(
+          await realEstateFungibleToken.getAddress(),
+          propertyId
+        )
+      ).to.equal(5);
+      expect(await realEstateFungibleToken.balanceOf(second.address, propertyId)).to.equal(
+        amountOfTokensToBuy
+      );
 
-  //     expect(await owner.provider.getBalance(owner.address)).to.equal(ownerWeiBalance + salePrice);
+      expect(await owner.provider.getBalance(owner.address)).to.equal(ownerWeiBalance + salePrice);
 
-  //     const saleDetails = await realEstateFungibleToken.getSale(saleId);
-  //     expect(saleDetails.seller).to.equal(ethers.ZeroAddress);
-  //     expect(saleDetails.propertyId).to.equal(0);
-  //     expect(saleDetails.amountOfTokens).to.equal(0);
-  //   });
+      const listings = await realEstateFungibleToken.getAllListingsForProperty(propertyId);
+      expect(listings.length).to.equal(2);
+    });
 
-  //   it("Should prevent buying tokens for listing IDs that don't exist", async function () {
-  //     const { realEstateFungibleToken, second } = await loadFixture(
-  //       deployRealEstateFungibleTokenFixture
-  //     );
+    it("Should allow buying multiple tokens", async function () {
+      const {
+        realEstateFungibleToken,
+        signers: { owner, second },
+        listings: [listing1, listing2, listing3],
+        property: { pricePerTokenInWei, feeInWei, propertyId },
+      } = await loadFixture(listTokensFixture);
 
-  //     const saleId = 1;
+      const amountOfTokensToBuy = 3;
 
-  //     await expect(
-  //       realEstateFungibleToken.connect(second).buyTokens(saleId, {
-  //         value: ethers.parseEther("1"),
-  //       })
-  //     ).to.be.revertedWith("Sale ID does not exist.");
-  //   });
+      expect(await realEstateFungibleToken.balanceOf(owner.address, propertyId)).to.equal(94);
+      expect(
+        await realEstateFungibleToken.balanceOf(
+          await realEstateFungibleToken.getAddress(),
+          propertyId
+        )
+      ).to.equal(6);
+      expect(await realEstateFungibleToken.balanceOf(second.address, propertyId)).to.equal(0);
 
-  //   it("Should prevent buying tokens for listing IDs that are already delisted", async function () {
-  //     const { realEstateFungibleToken, signers, listing } = await loadFixture(listTokensFixture);
-  //     const { saleId } = listing;
+      const ownerWeiBalance = await owner.provider.getBalance(owner.address);
 
-  //     await realEstateFungibleToken.delistTokenForSale(saleId);
+      const salePrice = pricePerTokenInWei * BigInt(amountOfTokensToBuy) + feeInWei;
+      await expect(
+        realEstateFungibleToken.connect(second).buyTokens(propertyId, amountOfTokensToBuy, {
+          value: salePrice,
+        })
+      )
+        .to.emit(realEstateFungibleToken, "TokensBought")
+        .withArgs([second.address, owner.address, propertyId, 1])
+        .to.emit(realEstateFungibleToken, "TokensBought")
+        .withArgs([second.address, owner.address, propertyId, 2]);
 
-  //     await expect(
-  //       realEstateFungibleToken.connect(signers.second).buyTokens(saleId, {
-  //         value: ethers.parseEther("1"),
-  //       })
-  //     ).to.be.revertedWith("Sale ID does not exist.");
-  //   });
+      expect(await realEstateFungibleToken.balanceOf(owner.address, propertyId)).to.equal(94);
+      expect(
+        await realEstateFungibleToken.balanceOf(
+          await realEstateFungibleToken.getAddress(),
+          propertyId
+        )
+      ).to.equal(3);
+      expect(await realEstateFungibleToken.balanceOf(second.address, propertyId)).to.equal(
+        amountOfTokensToBuy
+      );
 
-  //   it("Should prevent buying tokens with insufficient amount of funds provided", async function () {
-  //     const { realEstateFungibleToken, signers, listing, property } = await loadFixture(
-  //       listTokensFixture
-  //     );
-  //     const { saleId, amountOfTokensToSell } = listing;
-  //     const { pricePerTokenInWei } = property;
+      expect(await owner.provider.getBalance(owner.address)).to.equal(ownerWeiBalance + salePrice);
 
-  //     const expectedPayment = pricePerTokenInWei * BigInt(amountOfTokensToSell);
-  //     const insufficientPayment = expectedPayment - 1n;
+      const listings = await realEstateFungibleToken.getAllListingsForProperty(propertyId);
+      expect(listings.length).to.equal(1);
+      expect(listings[0].tokensListed).to.equal(3n);
+    });
 
-  //     await expect(
-  //       realEstateFungibleToken.connect(signers.second).buyTokens(saleId, {
-  //         value: insufficientPayment,
-  //       })
-  //     ).to.be.revertedWith("Insufficient payment.");
-  //   });
+    it("Should not change the order of listings when buying tokens", async function () {
+      const {
+        realEstateFungibleToken,
+        signers: { owner, second },
+        listings: [listing1, listing2, listing3],
+        property: { pricePerTokenInWei, feeInWei, propertyId },
+      } = await loadFixture(listTokensFixture);
 
-  //   it("Should prevent buying tokens with more funds than required", async function () {
-  //     const { realEstateFungibleToken, signers, listing, property } = await loadFixture(
-  //       listTokensFixture
-  //     );
-  //     const { saleId, amountOfTokensToSell } = listing;
-  //     const { pricePerTokenInWei, feeInWei } = property;
+      const amountOfTokensToBuy = 1;
 
-  //     const expectedPayment = pricePerTokenInWei * BigInt(amountOfTokensToSell);
-  //     const excessPayment = expectedPayment + feeInWei + 1n;
+      const ownerWeiBalance = await owner.provider.getBalance(owner.address);
 
-  //     await expect(
-  //       realEstateFungibleToken.connect(signers.second).buyTokens(saleId, {
-  //         value: excessPayment,
-  //       })
-  //     ).to.be.revertedWith("Excess payment.");
-  //   });
+      const salePrice = pricePerTokenInWei * BigInt(amountOfTokensToBuy) + feeInWei;
+      await realEstateFungibleToken.connect(second).buyTokens(propertyId, amountOfTokensToBuy, {
+        value: salePrice,
+      });
 
-  //   it("Should prevent buying tokens when a total price overflow occurs", async function () {
-  //     // This is a very hard test to write. Can't figure out a way to get this to happen however there is a check in the contract to prevent this.
-  //   });
-  // });
+      const listings = await realEstateFungibleToken.getAllListingsForProperty(propertyId);
+      expect(listings.length).to.equal(2);
+      expect(listings[0].tokensListed).to.equal(2n);
+      expect(listings[1].tokensListed).to.equal(3n);
+    });
+
+    it("Should prevent buying tokens for property ids that don't exist", async function () {
+      const { realEstateFungibleToken } = await loadFixture(deployRealEstateFungibleTokenFixture);
+
+      const propertyId = 1;
+
+      await expect(realEstateFungibleToken.buyTokens(propertyId, 1)).to.be.revertedWith(
+        "Property has not been tokenized."
+      );
+    });
+
+    it("Should prevent buying zero tokens", async function () {
+      const {
+        realEstateFungibleToken,
+        property: { propertyId },
+      } = await loadFixture(tokenizeFixture);
+
+      await expect(realEstateFungibleToken.buyTokens(propertyId, 0)).to.be.revertedWith(
+        "Cannot buy zero tokens."
+      );
+    });
+
+    it("Should prevent buying more tokens than are listed", async function () {
+      const {
+        realEstateFungibleToken,
+        signers: { owner, second },
+        listings: [listing1, listing2, listing3],
+        property: { pricePerTokenInWei, feeInWei, propertyId },
+      } = await loadFixture(listTokensFixture);
+
+      const amountOfTokensToBuy =
+        listing1.tokensListed + listing2.tokensListed + listing3.tokensListed + 1;
+
+      await expect(
+        realEstateFungibleToken.connect(second).buyTokens(propertyId, amountOfTokensToBuy, {
+          value: pricePerTokenInWei * BigInt(amountOfTokensToBuy) + feeInWei,
+        })
+      ).to.be.revertedWith("Not enough tokens available for sale.");
+    });
+
+    it("Should prevent buying tokens with insufficient funds", async function () {
+      const {
+        realEstateFungibleToken,
+        signers: { owner, second },
+        listings: [listing1, listing2, listing3],
+        property: { pricePerTokenInWei, feeInWei, propertyId },
+      } = await loadFixture(listTokensFixture);
+
+      const amountOfTokensToBuy = 1;
+
+      await expect(
+        realEstateFungibleToken.connect(second).buyTokens(propertyId, amountOfTokensToBuy, {
+          value: pricePerTokenInWei * BigInt(amountOfTokensToBuy) + feeInWei - 1n,
+        })
+      ).to.be.revertedWith("Incorrect payment amount.");
+    });
+
+    it("Should prevent buying tokens with more funds than required", async function () {
+      const {
+        realEstateFungibleToken,
+        signers: { owner, second },
+        listings: [listing1, listing2, listing3],
+        property: { pricePerTokenInWei, feeInWei, propertyId },
+      } = await loadFixture(listTokensFixture);
+
+      const amountOfTokensToBuy = 1;
+
+      await expect(
+        realEstateFungibleToken.connect(second).buyTokens(propertyId, amountOfTokensToBuy, {
+          value: pricePerTokenInWei * BigInt(amountOfTokensToBuy) + feeInWei + 1n,
+        })
+      ).to.be.revertedWith("Incorrect payment amount.");
+    });
+
+    it("Should transfer the fee to the contract owner", async function () {
+      const {
+        realEstateFungibleToken,
+        signers: { owner, second, third },
+        listings: [listing1, listing2, listing3],
+        property: { pricePerTokenInWei, feeInWei, propertyId },
+      } = await loadFixture(listTokensFixture);
+
+      const amountOfTokensToBuy = 1;
+
+      await realEstateFungibleToken.transferOwnership(third.address);
+
+      const thirdWeiBalance = await third.provider.getBalance(third.address);
+
+      await realEstateFungibleToken.connect(second).buyTokens(propertyId, amountOfTokensToBuy, {
+        value: pricePerTokenInWei * BigInt(amountOfTokensToBuy) + feeInWei,
+      });
+
+      expect(await third.provider.getBalance(third.address)).to.equal(thirdWeiBalance + feeInWei);
+    });
+  });
 
   describe("Updating Property Details", function () {
     it("Should allow updating the price per token of a tokenized property", async function () {
