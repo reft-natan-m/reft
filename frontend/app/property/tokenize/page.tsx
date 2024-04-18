@@ -14,7 +14,7 @@ import { UserSession } from "@/app/api/auth/[...nextauth]/route";
 
 interface NewFormData {
   propertyId: string;
-  images: FileList | null;
+  images: File[];
 }
 
 export interface FormData {
@@ -78,7 +78,6 @@ const Tokenize = () => {
 
   const handleSubmitAllForms = async () => {
     let propertyData;
-    let newFormData: NewFormData;
 
     const postData = {
       country: formData.country,
@@ -109,29 +108,38 @@ const Tokenize = () => {
       if (res.ok) {
         propertyData = await res.json();
         console.log("data: ", propertyData);
-        newFormData = {
-          propertyId: propertyData.id,
-          images: formData.images,
-        };
-        console.log(newFormData);
-        const uploadRes = await fetch("/api/property/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newFormData),
-        });
+        const images = formData.images;
+        console.log("Images: ", images);
 
-        if (uploadRes.ok) {
-          // Handle success
-          console.log("Upload successful");
-        } else {
-          // Handle error
-          console.error("Upload failed");
+        if (images) {
+          const newFormData = new FormData();
+          newFormData.append("propertyId", propertyData.id);
+
+          for (let i = 0; i < images.length; i++) {
+            const file = images[i];
+            newFormData.append("images", file);
+          }
+
+          console.log("NewFormData: ", newFormData);
+          try {
+            const uploadRes = await fetch("/api/property/upload", {
+              method: "POST",
+              body: newFormData,
+            });
+            if (uploadRes.ok) {
+              // Handle success
+              console.log("Upload successful");
+            } else {
+              // Handle error
+              console.error("Upload failed");
+            }
+          } catch (error) {
+            console.error("The uploading API did a little fucky-wucky");
+          }
         }
 
-        router.refresh();
         router.push("/");
+        router.refresh();
       } else {
         alert("shit went wrong");
       }

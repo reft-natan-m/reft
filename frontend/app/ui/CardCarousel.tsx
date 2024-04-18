@@ -10,12 +10,15 @@ const CardCarousel: React.FC = () => {
   const [propertyData, setPropertyData] = useState<any[]>([]);
   const [openModals, setOpenModals] = useState<boolean[][]>([]);
 
+  // Carousel views properties in groups of three
+  const MAX: number = 12;
+
   useEffect(() => {
     // Fetch property data from your API
     fetch("/api/property/list")
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
+      .then((properties) => {
+        const data = properties.slice(0, MAX);
         setPropertyData(data);
         setOpenModals(
           Array(data.length)

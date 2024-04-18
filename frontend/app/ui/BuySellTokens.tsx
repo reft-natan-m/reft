@@ -40,7 +40,7 @@ const BuySellTokens: React.FC<BuySellTokensProps> = ({
         tokens: numberOfTokens,
       };
 
-      const res = await fetch("/api/listing/create", {
+      fetch("/api/listing/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

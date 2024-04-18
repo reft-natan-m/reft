@@ -1,8 +1,10 @@
-import { Property } from "@prisma/client";
+import { Property, Token } from "@prisma/client";
 import { Button } from "flowbite-react";
 import React, { useState } from "react";
 import BuySellTokens from "./BuySellTokens";
 import ModalComp from "./ModalComp";
+import { useSession } from "next-auth/react";
+import { UserSession } from "@/app/api/auth/[...nextauth]/route";
 
 interface BuySellButtonsProps {
   data: Property;
@@ -13,6 +15,9 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({ data }) => {
   const [buttonOption, setButtonOption] = useState(false);
   const [modalHeader, setModalHeader] = useState("");
   const [totalOption, setTotalOption] = useState(0);
+
+  const { data: session } = useSession();
+  const userSession = session?.user as UserSession;
 
   const handleBuy = () => {
     setButtonOption(true);
@@ -28,7 +33,15 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({ data }) => {
     setButtonOption(false);
     setOpenModal(true);
     setModalHeader("Sell Tokens");
-    setTotalOption(10);
+    const numTokens = userSession.tokens.map((token: Token) => {
+      if (token.propertyId === data.id && !token.listed) {
+        return token.numberOfTokens;
+      }
+    });
+    const token = numTokens.filter((value) => value !== undefined);
+    if (token[0]) {
+      setTotalOption(token[0]);
+    }
   };
 
   return (

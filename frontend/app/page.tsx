@@ -1,9 +1,9 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { UserSession } from "./api/auth/[...nextauth]/route";
 import CardCarousel from "./ui/CardCarousel";
 import Feature from "./ui/Features";
-import { UserSession } from "./api/auth/[...nextauth]/route";
 import SearchBar from "./ui/SearchBar";
 import { FooterComp } from "./ui/Footer";
 

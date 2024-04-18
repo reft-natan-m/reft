@@ -1,30 +1,44 @@
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { NextApiRequest, NextApiResponse } from "next";
+import { writeFile } from "fs/promises";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "POST") {
-    const propertyId = req.body.propertyId as string;
-    const images = req.body.images as string[]; // Assuming you're sending file paths from the client
-
-    // Create folder
-    const folderPath = path.join(process.cwd(), "public", "images", propertyId);
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath);
-    }
-
-    // Move and rename images
-    images.forEach((image, index) => {
-      const oldPath = path.join(process.cwd(), "public", image);
-      const newPath = path.join(
-        folderPath,
-        `image${index + 1}${path.extname(image)}`
-      );
-      fs.renameSync(oldPath, newPath);
-    });
-
-    res.status(200).json({ message: "Upload successful" });
-  } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+const createFolder = (folderPath: string) => {
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath);
   }
+};
+
+export async function POST(req: NextRequest) {
+  const data = await req.formData();
+  console.log(data);
+
+  const propertyId: string = data.get("propertyId") as unknown as string;
+
+  const files: File[] | null = data.getAll("images") as unknown as File[];
+
+  if (!files || files.length === 0) {
+    return NextResponse.json({ success: false });
+  }
+
+  const uploadDir = path.resolve("./public/images");
+  const propertyImagePath = path.join(uploadDir, propertyId);
+  createFolder(propertyImagePath);
+
+  const uploadTasks = files.map(async (file: File, index: number) => {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const filename = path.join(propertyImagePath, `Image${index}.jpg`);
+
+    await writeFile(filename, buffer);
+    console.log(
+      `File ${file.name} uploaded successfully as Image${index}.jpg.`
+    );
+  });
+
+  await Promise.all(uploadTasks);
+
+  console.log(`open ${uploadDir} to see the uploaded files`);
+  return NextResponse.json({ success: true });
 }
