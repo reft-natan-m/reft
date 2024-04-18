@@ -77,7 +77,11 @@ contract RealEstateFungibleToken is
     // propertyId to an array of listings, stores all tokens for sale for a given property
     mapping(uint256 => TokenListing[]) public listings;
 
-    event TokensMinted(Property property, address indexed owner);
+    event TokensMinted(
+        uint256 propertyId,
+        Property property,
+        address indexed owner
+    );
     event TokensBought(TokenPurchase purchase);
     event TokensListed(TokenListing listing);
     event TokensDelisted(TokenDelisting delisting);
@@ -199,7 +203,7 @@ contract RealEstateFungibleToken is
         properties[propertyId] = property;
 
         _mint(to, propertyId, totalTokens, "");
-        emit TokensMinted(property, to);
+        emit TokensMinted(propertyId, property, to);
     }
 
     /** @dev Function to allow a user to list their tokens for sale, transferring them to the contract for escrow.
@@ -274,6 +278,10 @@ contract RealEstateFungibleToken is
         uint256 amountToDelist
     ) external {
         require(amountToDelist > 0, "Cannot delist zero tokens.");
+        require(
+            properties[propertyId].totalTokens > 0,
+            "Property has not been tokenized."
+        );
         uint256 remaining = amountToDelist;
         TokenListing[] storage tokenListings = listings[propertyId];
         uint256 index = 0;
@@ -345,6 +353,10 @@ contract RealEstateFungibleToken is
         uint256 amountToBuy
     ) external payable nonReentrant {
         require(amountToBuy > 0, "Cannot buy zero tokens.");
+        require(
+            properties[propertyId].totalTokens > 0,
+            "Property has not been tokenized."
+        );
         uint256 remaining = amountToBuy;
         uint256 totalPrice = 0;
         uint256 index = 0;
