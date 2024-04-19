@@ -29,18 +29,42 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({ data }) => {
       setTotalOption(0);
     }
   };
-  const handleSell = () => {
+  const handleSell = async () => {
     setButtonOption(false);
     setOpenModal(true);
     setModalHeader("Sell Tokens");
-    const numTokens = userSession.tokens.map((token: Token) => {
-      if (token.propertyId === data.id && !token.listed) {
-        return token.numberOfTokens;
+    try {
+      // Get user email from session
+      const userEmail = userSession.email;
+
+      // Call the API to get user data
+      const response = await fetch(`/api/user?email=${userEmail}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
       }
-    });
-    const token = numTokens.filter((value) => value !== undefined);
-    if (token[0]) {
-      setTotalOption(token[0]);
+
+      // Parse the JSON response
+      const userData = await response.json();
+
+      // Extract tokens from user data
+      const tokens = userData.tokens;
+
+      // Calculate total tokens for sale
+      const numTokens = tokens.map((token: Token) => {
+        if (token.propertyId === data.id && !token.listed) {
+          return token.numberOfTokens;
+        }
+      });
+      const token = numTokens.filter(
+        (value: number | undefined) => value !== undefined
+      );
+      if (token[0]) {
+        setTotalOption(token[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      // Handle error, show error message, etc.
     }
   };
 

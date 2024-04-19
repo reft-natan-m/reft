@@ -1,5 +1,4 @@
 import React from "react";
-import { PropertyData, BuySellData } from "./CardData";
 import GalleryComp from "@/app/ui/GalleryComp";
 import BuySellButtons from "./BuySellButtons";
 import { Property } from "@prisma/client";
@@ -19,7 +18,7 @@ const PropertyDetail: React.FC<PropertyDetailProps> = ({ data }) => {
       <ul className="divide-y divide-gray-200 dark:divide-gray-700">
         <li>
           <div className="mb-4">
-            <GalleryComp />
+            <GalleryComp data={data} />
           </div>
         </li>
         <li>

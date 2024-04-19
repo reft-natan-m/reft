@@ -11,7 +11,7 @@ const CardCarousel: React.FC = () => {
   const [openModals, setOpenModals] = useState<boolean[][]>([]);
 
   // Carousel views properties in groups of three
-  const MAX: number = 12;
+  const MAX: number = 100;
 
   useEffect(() => {
     // Fetch property data from your API
@@ -30,6 +30,27 @@ const CardCarousel: React.FC = () => {
         console.error("Error fetching property data:", error);
       });
   }, []);
+
+  useEffect(() => {
+    // Function to handle updates to property information
+    const updatePropertyData = () => {
+      //Fetch updated property data or update propertyData state directly
+      fetch("/api/property/list")
+        .then((response) => response.json())
+        .then((properties) => {
+          const newData = properties.slice(0, MAX);
+          setPropertyData(newData);
+        })
+        .catch((error) => {
+          console.error("Error fetching updated property data:", error);
+        });
+    };
+
+    // Call the function to update property data whenever needed
+    updatePropertyData();
+
+    // This effect depends on propertyData state, so add it to the dependency array
+  }, [propertyData]);
 
   const chunkArray = (arr: any[], size: number) => {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
@@ -58,40 +79,42 @@ const CardCarousel: React.FC = () => {
       </h3>
       <div className="w-full h-screen overflow-hidden flex items-center justify-center">
         <div className="w-full max-w-screen-xl h-full">
-          <Carousel pauseOnHover indicators={false}>
-            {chunkedData.map((chunk, chunkIndex) => (
-              <div
-                key={chunkIndex}
-                className="flex items-center justify-center"
-              >
-                {chunk.map((data, cardIndex) => (
-                  <div
-                    key={data.id}
-                    className={`mx-10 ${
-                      cardIndex !== chunk.length - 1 ? "mr-4" : ""
-                    }`}
-                  >
-                    <button
-                      onClick={() => handleOpenModal(chunkIndex, cardIndex)}
+          {chunkedData && (
+            <Carousel pauseOnHover indicators={false}>
+              {chunkedData.map((chunk, chunkIndex) => (
+                <div
+                  key={chunkIndex}
+                  className="flex items-center justify-center"
+                >
+                  {chunk.map((data, cardIndex) => (
+                    <div
+                      key={data.id}
+                      className={`mx-10 ${
+                        cardIndex !== chunk.length - 1 ? "mr-4" : ""
+                      }`}
                     >
-                      <PropertyCard data={data} />
-                    </button>
-                    <ModalComp
-                      key={`modal-${chunkIndex}-${cardIndex}`}
-                      openModal={openModals[chunkIndex][cardIndex]}
-                      setOpenModal={() =>
-                        handleCloseModal(chunkIndex, cardIndex)
-                      }
-                      modalHeader={"Token Details"}
-                      modalSize="3xl"
-                    >
-                      <PropertyDetail data={data} />
-                    </ModalComp>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </Carousel>
+                      <button
+                        onClick={() => handleOpenModal(chunkIndex, cardIndex)}
+                      >
+                        <PropertyCard data={data} />
+                      </button>
+                      <ModalComp
+                        key={`modal-${chunkIndex}-${cardIndex}`}
+                        openModal={openModals[chunkIndex][cardIndex]}
+                        setOpenModal={() =>
+                          handleCloseModal(chunkIndex, cardIndex)
+                        }
+                        modalHeader={"Token Details"}
+                        modalSize="3xl"
+                      >
+                        <PropertyDetail data={data} />
+                      </ModalComp>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </Carousel>
+          )}
         </div>
       </div>
     </div>
