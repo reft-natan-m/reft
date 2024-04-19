@@ -35,7 +35,6 @@ model Property {
   tokens           Token[]
   tokensMinted     Int
   tokensforSale    Int?
-  images           Int
 }
 
 model Token {
