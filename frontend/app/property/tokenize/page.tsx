@@ -29,7 +29,7 @@ export interface FormData {
   expense: number;
   tokens: number;
   tokenSale: number;
-  images: FileList | null;
+  images: number;
 }
 
 const Tokenize = () => {
@@ -54,7 +54,7 @@ const Tokenize = () => {
     expense: 0,
     tokens: 100,
     tokenSale: 0,
-    images: null,
+    images: 0,
   });
 
   const prevStep = () => {

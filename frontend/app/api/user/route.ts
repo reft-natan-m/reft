@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -17,6 +15,7 @@ export async function GET(request: NextRequest) {
     where: {
       email: email,
     },
+    include: { tokens: true },
   });
 
   if (!user) {
@@ -31,5 +30,6 @@ export async function GET(request: NextRequest) {
     email: user.email,
     emailVerified: user.emailVerified,
     avatar: user.avatar,
+    tokens: user.tokens,
   });
 }

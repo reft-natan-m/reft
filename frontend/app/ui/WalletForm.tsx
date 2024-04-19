@@ -3,6 +3,7 @@
 import { Modal, List } from "flowbite-react";
 import Link from "next/link";
 import { useState } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { WalletConnect } from "./WalletConnect";
 
 function WalletForm() {

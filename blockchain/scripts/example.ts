@@ -56,12 +56,8 @@ async function main() {
   /***************************************************
    * ! LISTING TOKENS
    ***************************************************/
-  const saleId = 1;
-  const amountOfTokensToSell = 1;
 
-  console.log(
-    `Signer #2 is listing ${amountOfTokensToSell} tokens of Property #${propertyId} for sale`
-  );
+  console.log(`Signer #2 is listing tokens of Property #${propertyId} for sale`);
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(
     `Contract Property #${propertyId} Tokens:  ${await reft.balanceOf(tokenAddress, propertyId)}`
@@ -70,11 +66,25 @@ async function main() {
     `Signer #2 Property #${propertyId} Tokens:  ${await reft.balanceOf(second.address, propertyId)}`
   );
 
-  await secondSignerReftInstance.listTokenForSale(saleId, propertyId, amountOfTokensToSell, {
+  await secondSignerReftInstance.listTokenForSale(propertyId, 1, {
     value: feeInWei,
   });
 
-  console.log(`Sale #${saleId} Listed`);
+  await secondSignerReftInstance.listTokenForSale(propertyId, 13, {
+    value: feeInWei,
+  });
+
+  await secondSignerReftInstance.listTokenForSale(propertyId, 2, {
+    value: feeInWei,
+  });
+
+  await secondSignerReftInstance.listTokenForSale(propertyId, 5, {
+    value: feeInWei,
+  });
+
+  await secondSignerReftInstance.listTokenForSale(propertyId, 9, {
+    value: feeInWei,
+  });
 
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(
@@ -89,7 +99,7 @@ async function main() {
    ***************************************************/
   const thirdSingerReftInstance = reft.connect(third);
   console.log(
-    `Signer #3 is buying ${amountOfTokensToSell} tokens of Property #${propertyId} for ${propertyValueInEthereum} ETH`
+    `Signer #3 is buying tokens of Property #${propertyId} for ${propertyValueInEthereum} ETH`
   );
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(`Signer #3 Balance ${await getAccountBalance(third)} ETH`);
@@ -103,11 +113,15 @@ async function main() {
     `Signer #3 Property #${propertyId} Tokens:  ${await reft.balanceOf(third.address, propertyId)}`
   );
 
-  await thirdSingerReftInstance.buyTokens(saleId, {
-    value: propertyValueInWei + feeInWei,
+  await thirdSingerReftInstance.buyTokens(propertyId, 5, {
+    value: propertyValueInWei * 5n + feeInWei,
   });
 
-  console.log(`Signer #3 bought ${amountOfTokensToSell} tokens`);
+  await thirdSingerReftInstance.buyTokens(propertyId, 13, {
+    value: propertyValueInWei * 13n + feeInWei,
+  });
+
+  console.log(`Signer #3 bought tokens`);
 
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(`Signer #3 Balance ${await getAccountBalance(third)} ETH`);
@@ -124,11 +138,7 @@ async function main() {
   /***************************************************
    * ! DELISTING TOKENS
    ***************************************************/
-  const otherSaleId = 2;
-
-  console.log(
-    `Signer #2 is listing ${amountOfTokensToSell} tokens of Property #${propertyId} for sale`
-  );
+  console.log(`Signer #2 is listing tokens of Property #${propertyId} for sale`);
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(
     `Contract Property #${propertyId} Tokens:  ${await reft.balanceOf(tokenAddress, propertyId)}`
@@ -137,11 +147,11 @@ async function main() {
     `Signer #2 Property #${propertyId} Tokens:  ${await reft.balanceOf(second.address, propertyId)}`
   );
 
-  await secondSignerReftInstance.listTokenForSale(otherSaleId, propertyId, amountOfTokensToSell, {
+  await secondSignerReftInstance.listTokenForSale(propertyId, 4, {
     value: feeInWei,
   });
 
-  console.log(`Sale #${otherSaleId} Listed`);
+  console.log(`Tokens Listed`);
 
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(
@@ -151,9 +161,7 @@ async function main() {
     `Signer #2 Property #${propertyId} Tokens:  ${await reft.balanceOf(second.address, propertyId)}`
   );
 
-  console.log(
-    `Signer #2 is delisting ${amountOfTokensToSell} tokens of Property #${propertyId} for sale`
-  );
+  console.log(`Signer #2 is delisting tokens of Property #${propertyId} for sale`);
 
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(
@@ -163,9 +171,9 @@ async function main() {
     `Signer #2 Property #${propertyId} Tokens:  ${await reft.balanceOf(second.address, propertyId)}`
   );
 
-  await secondSignerReftInstance.delistTokenForSale(otherSaleId);
+  await secondSignerReftInstance.delistTokenForSale(propertyId, 7);
 
-  console.log(`Sale #${otherSaleId} Delisted`);
+  console.log(`Tokens Delisted`);
 
   console.log(`Signer #2 Balance ${await getAccountBalance(second)} ETH`);
   console.log(

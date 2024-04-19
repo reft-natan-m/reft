@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {console} from "hardhat/console.sol";
+// import {console} from "hardhat/console.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -77,7 +77,11 @@ contract RealEstateFungibleToken is
     // propertyId to an array of listings, stores all tokens for sale for a given property
     mapping(uint256 => TokenListing[]) public listings;
 
-    event PropertyTokenized(Property property, address indexed owner);
+    event TokensMinted(
+        uint256 propertyId,
+        Property property,
+        address indexed owner
+    );
     event TokensBought(TokenPurchase purchase);
     event TokensListed(TokenListing listing);
     event TokensDelisted(TokenDelisting delisting);
@@ -199,7 +203,7 @@ contract RealEstateFungibleToken is
         properties[propertyId] = property;
 
         _mint(to, propertyId, totalTokens, "");
-        emit PropertyTokenized(property, to);
+        emit TokensMinted(propertyId, property, to);
     }
 
     /** @dev Function to allow a user to list their tokens for sale, transferring them to the contract for escrow.
@@ -265,7 +269,8 @@ contract RealEstateFungibleToken is
     }
 
     /**
-     * @dev Function to delist a specified number of tokens for a property. Tokens are delisted from the oldest listing made by the seller.
+     * @dev Function to delist a specified number of tokens for a property.
+     * Tokens are delisted from the oldest listing made by the seller.
      * @param propertyId The property ID.
      * @param amountToDelist The number of tokens the seller wants to delist.
      */
@@ -274,6 +279,10 @@ contract RealEstateFungibleToken is
         uint256 amountToDelist
     ) external {
         require(amountToDelist > 0, "Cannot delist zero tokens.");
+        require(
+            properties[propertyId].totalTokens > 0,
+            "Property has not been tokenized."
+        );
         uint256 remaining = amountToDelist;
         TokenListing[] storage tokenListings = listings[propertyId];
         uint256 index = 0;
@@ -345,11 +354,16 @@ contract RealEstateFungibleToken is
         uint256 amountToBuy
     ) external payable nonReentrant {
         require(amountToBuy > 0, "Cannot buy zero tokens.");
+        require(
+            properties[propertyId].totalTokens > 0,
+            "Property has not been tokenized."
+        );
         uint256 remaining = amountToBuy;
         uint256 totalPrice = 0;
         uint256 index = 0;
         TokenListing[] storage tokenListings = listings[propertyId];
 
+        // The remaining check is the main check, the index check is a failsafe
         while (remaining > 0 && index < tokenListings.length) {
             TokenListing storage tokenListing = tokenListings[index];
             if (tokenListing.tokensListed > 0) {
@@ -386,13 +400,21 @@ contract RealEstateFungibleToken is
 
                     // Remove the last element after shifting
                     tokenListings.pop();
+                    continue;
                 } else {
                     // the listing is not empty, check while loop conditions again for the same index
                     continue;
                 }
             } else {
-                // Move to the next sale if the current sale is not the seller's
-                index++;
+                // This is pretty much impossible to hit, but just in case
+                // Shift all elements to the left to maintain order and remove the current sale
+                for (uint256 i = index; i < tokenListings.length - 1; i++) {
+                    tokenListings[i] = tokenListings[i + 1];
+                }
+
+                // Remove the last element after shifting
+                tokenListings.pop();
+                continue;
             }
         }
 
