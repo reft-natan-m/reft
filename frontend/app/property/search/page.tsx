@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropertyCard from "@/app/ui/PropertyCard";
 import SearchNav from "@/app/ui/SearchNav";
 import ModalComp from "@/app/ui/ModalComp";
@@ -16,35 +16,24 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
     ? Number(searchParams["per_page"])
     : 15;
 
-  // Generate 90 property objects for testing pagination
-  const totalProperties = 90;
-  const cardDataArray = Array.from({ length: totalProperties }, (_, index) => ({
-    id: index + 1,
-    state: "CA",
-    city: `Los Angeles ${index + 1}`,
-    street1: `${index + 1} Main St`,
-    street2: "",
-    zip: `9000${index + 1}`,
-    year: 1900 + (index + 1),
-    value: 500000 + (index + 1) * 10000,
-    tokens: 100 + index,
-    tokenToList: 10 + index,
-    tokenPrice: (500000 + (index + 1) * 10000) / (100 + index),
-    propType: "Residential",
-    propSubtype: "Single Family",
-    size: 1000 + index * 100,
-    owners: "Garry",
-    ownPercent: "100%",
-    entity: "individual",
-    income: 100 + index * 100,
-    expense: 10 + index * 10,
-    image: "/images/Dunno.jpg",
-    sizeValue: (500000 + (index + 1) * 10000) / (1000 + index * 100),
-  }));
+  const [propertyData, setPropertyData] = useState<any[]>([]);
+  const [openModals, setOpenModals] = useState<boolean[]>([]);
 
-  const [openModals, setOpenModals] = useState<boolean[]>(
-    Array(cardDataArray.length).fill(false)
-  );
+  useEffect(() => {
+    fetchPropertyData();
+  }, []);
+
+  const fetchPropertyData = () => {
+    fetch("/api/property/list")
+      .then((response) => response.json())
+      .then((properties) => {
+        setPropertyData(properties);
+        setOpenModals(Array(properties.length).fill(false));
+      })
+      .catch((error) => {
+        console.error("Error fetching property data:", error);
+      });
+  };
 
   const handleOpenModal = (index: number) => {
     const newModals = [...openModals];
@@ -61,7 +50,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
   const start = (page - 1) * per_page;
   const end = start + per_page;
 
-  const entries = cardDataArray.slice(start, end);
+  const entries = propertyData.slice(start, end);
 
   const search = true;
 
@@ -70,7 +59,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
       <SearchNav
         search={search}
         per_Page={per_page}
-        totalProperties={totalProperties}
+        totalProperties={propertyData.length}
       />
       <div className="flex justify-center mt-4 mb-24">
         <div className="w-full">

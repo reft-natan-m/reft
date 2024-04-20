@@ -11,10 +11,13 @@ const CardCarousel: React.FC = () => {
   const [openModals, setOpenModals] = useState<boolean[][]>([]);
 
   // Carousel views properties in groups of three
-  const MAX: number = 100;
+  const MAX: number = 12;
 
   useEffect(() => {
-    // Fetch property data from your API
+    fetchPropertyData();
+  }, []);
+
+  const fetchPropertyData = () => {
     fetch("/api/property/list")
       .then((response) => response.json())
       .then((properties) => {
@@ -29,28 +32,19 @@ const CardCarousel: React.FC = () => {
       .catch((error) => {
         console.error("Error fetching property data:", error);
       });
-  }, []);
+  };
 
-  useEffect(() => {
-    // Function to handle updates to property information
-    const updatePropertyData = () => {
-      //Fetch updated property data or update propertyData state directly
-      fetch("/api/property/list")
-        .then((response) => response.json())
-        .then((properties) => {
-          const newData = properties.slice(0, MAX);
-          setPropertyData(newData);
-        })
-        .catch((error) => {
-          console.error("Error fetching updated property data:", error);
-        });
-    };
-
-    // Call the function to update property data whenever needed
-    updatePropertyData();
-
-    // This effect depends on propertyData state, so add it to the dependency array
-  }, [propertyData]);
+  const updatePropertyData = () => {
+    fetch("/api/property/list")
+      .then((response) => response.json())
+      .then((properties) => {
+        const newData = properties.slice(0, MAX);
+        setPropertyData(newData);
+      })
+      .catch((error) => {
+        console.error("Error fetching updated property data:", error);
+      });
+  };
 
   const chunkArray = (arr: any[], size: number) => {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
@@ -75,7 +69,7 @@ const CardCarousel: React.FC = () => {
   return (
     <div>
       <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:text-2xl">
-        Real Estate Near You.
+        Real Estate Opportunities For You.
       </h3>
       <div className="w-full h-screen overflow-hidden flex items-center justify-center">
         <div className="w-full max-w-screen-xl h-full">
@@ -96,7 +90,10 @@ const CardCarousel: React.FC = () => {
                       <button
                         onClick={() => handleOpenModal(chunkIndex, cardIndex)}
                       >
-                        <PropertyCard data={data} />
+                        <PropertyCard
+                          data={data}
+                          updatePropertyData={updatePropertyData}
+                        />
                       </button>
                       <ModalComp
                         key={`modal-${chunkIndex}-${cardIndex}`}
@@ -107,7 +104,10 @@ const CardCarousel: React.FC = () => {
                         modalHeader={"Token Details"}
                         modalSize="3xl"
                       >
-                        <PropertyDetail data={data} />
+                        <PropertyDetail
+                          data={data}
+                          updatePropertyData={updatePropertyData}
+                        />
                       </ModalComp>
                     </div>
                   ))}

@@ -13,6 +13,8 @@ interface BuySellTokensProps {
   tokenPrice: number;
   data: Property;
   buttonOption: Boolean;
+  updatePropertyData?: () => void;
+  ETH: number | null;
 }
 
 const formatter = new Intl.NumberFormat("en-US", {
@@ -26,13 +28,28 @@ const BuySellTokens: React.FC<BuySellTokensProps> = ({
   tokenPrice,
   data,
   buttonOption,
+  updatePropertyData,
+  ETH,
 }) => {
   const { data: session } = useSession();
   const userSession = session?.user as UserSession;
   const [numberOfTokens, setNumberOfTokens] = useState<number>(1);
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     if (buttonOption) {
-      console.log("Insert buy logic here");
+      const formData = {
+        userId: userSession.id,
+        propertyId: data.id,
+        tokens: numberOfTokens,
+      };
+
+      fetch("/api/listing/buy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
     } else {
       const formData = {
         userId: userSession.id,
@@ -47,6 +64,9 @@ const BuySellTokens: React.FC<BuySellTokensProps> = ({
         },
         body: JSON.stringify(formData),
       });
+    }
+    if (updatePropertyData) {
+      updatePropertyData();
     }
     setOpenModal(false);
   };
@@ -73,7 +93,8 @@ const BuySellTokens: React.FC<BuySellTokensProps> = ({
           <div className="w-16"> / {totalOption}</div>
         </div>
         <div>
-          Estimated value: {formatter.format(tokenPrice * numberOfTokens)}
+          Estimated value: {formatter.format(tokenPrice * numberOfTokens)} /{" "}
+          {ETH !== null ? (ETH * numberOfTokens).toFixed(2) : "Loading..."} ETH
         </div>
         <div className="flex justify-center items-center mt-4">
           <Button type="submit">Confirm</Button>

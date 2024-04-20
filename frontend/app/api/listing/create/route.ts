@@ -67,10 +67,6 @@ export async function POST(req: NextRequest) {
       where: { id: propertyId },
     });
 
-    const property = await prisma.property.findUnique({
-      where: { id: propertyId },
-    });
-
     await prisma.property.update({
       where: {
         id: propertyId,

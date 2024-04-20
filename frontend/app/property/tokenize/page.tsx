@@ -137,15 +137,15 @@ const Tokenize = () => {
             console.error("The uploading API did a little fucky-wucky");
           }
         }
-
-        router.push("/");
-        router.refresh();
       } else {
         alert("shit went wrong");
       }
     } catch (error) {
       // Handle network error or other exceptions
     }
+
+    router.push("/");
+    router.refresh();
   };
 
   return (
