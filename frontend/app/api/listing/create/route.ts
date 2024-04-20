@@ -1,11 +1,11 @@
 import prisma from "@/lib/prisma";
+import { Token } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { userId, propertyId, tokens } = body;
 
-  console.log("userID:", userId, "PropertyId:", propertyId, "Tokens:", tokens);
   try {
     const prismaUser = await prisma.user.findUnique({
       where: { id: userId },
@@ -16,17 +16,14 @@ export async function POST(req: NextRequest) {
       return new NextResponse("User doesnt exist", { status: 400 });
     }
 
-    console.log(prismaUser);
-
-    const tokenToSplit = prismaUser.tokens.map((token) => {
-      if (token.propertyId === propertyId && token.listed === (false || null)) {
-        if (token) {
-          return token;
-        }
-      }
+    const tokenToList = prismaUser.tokens.filter((token) => {
+      return (
+        token.propertyId === propertyId &&
+        (token.listed === false || token.listed === null)
+      );
     });
 
-    const token = tokenToSplit.filter((value) => value !== undefined);
+    const token = tokenToList.filter((value) => value !== undefined);
 
     if (!token[0]) {
       return new NextResponse(
@@ -51,13 +48,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await prisma.token.update({
-      where: {
-        id: token[0].id,
-      },
-      data: {
-        numberOfTokens: token[0].numberOfTokens - tokens,
-      },
+    if (token[0].numberOfTokens === tokens) {
+      await prisma.token.delete({
+        where: { id: token[0].id },
+      });
+    } else {
+      await prisma.token.update({
+        where: {
+          id: token[0].id,
+        },
+        data: {
+          numberOfTokens: token[0].numberOfTokens - tokens,
+        },
+      });
+    }
+
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId },
     });
 
     await prisma.property.update({
@@ -65,7 +72,7 @@ export async function POST(req: NextRequest) {
         id: propertyId,
       },
       data: {
-        tokensforSale: { increment: tokens },
+        tokensforSale: property?.tokensforSale + tokens,
       },
     });
 
