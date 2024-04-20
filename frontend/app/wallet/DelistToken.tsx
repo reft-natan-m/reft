@@ -3,27 +3,36 @@ import { Button } from "flowbite-react";
 import { useEthersSigner } from "../../app/api/transactions";
 import { Contract } from 'ethers';
 import RealEstateFungibleTokenData from '../../../blockchain/artifacts/contracts/RealEstateFungibleToken.sol/RealEstateFungibleToken.json';
-import { useAccount } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
 
 // Extract the ABI from the loaded JSON data
 const abi = RealEstateFungibleTokenData.abi; 
 
-const Delist = ({ contractAddressTest, saleId }: {
-  contractAddressTest: string,
-  saleId: any,
+const Delist = ({ contractAddress, propertyId, amountToDeList }: {
+  contractAddress: string,
+  propertyId: number,
+  amountToDeList: number,
 }) => {
   const { address } = useAccount();
   const signer = useEthersSigner();
+  const balance = useBalance({address: address});
 
   // DELIST FUNCTION
   const delistTokens = async () => {
-    if (!address) {
+    const ethBalance = balance.data?.value;
+    if (!address || !ethBalance || !signer) {
       alert('Please connect your wallet first.');
       return;
     }
-    const reft = new Contract(contractAddressTest, abi, signer);
+    if (amountToDeList < 1) {
+      alert('Tokens to be delisted cannot be zero or negative.')
+      return;
+    }
+    
+    const reft = new Contract(contractAddress, abi, signer);
+
     try {
-      const delistResult = await reft.delistTokenForSale(saleId);
+      const delistResult = await reft.delistTokenForSale(propertyId, amountToDeList);
       console.log('Delist tokens result:', delistResult);
       
       alert('Tokens delisted from sale successfully!');

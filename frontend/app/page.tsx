@@ -7,14 +7,15 @@ import Mint from "./wallet/Mint";
 import Buy from "./wallet/BuyToken";
 import List from "./wallet/ListToken";
 import Delist from "./wallet/DelistToken";
+import MintAndList from "./wallet/MintAndList";
 
 //TEST DATA SCENEARIO
 const contractAddressTest = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
 const uri = "www.example.com/api/property/1";
-const propertyId = 2;
+const propertyId = 5;
 const propertyValueInEthereum = 1;
 const tokensToMint = 100;
-const tokensToBuy = 100;
+const tokensToBuy = 1;
 const saleId = 1;
 const tokens = 10;
 
@@ -26,27 +27,34 @@ const Home = () => {
         Real Estate Near You.
       </h3>
       {/* <Mint
-        contractAddressTest={contractAddressTest}
+        contractAddress={contractAddressTest}
         propertyId={propertyId}
         propertyValueInEthereum={propertyValueInEthereum}
         tokensToMint={tokensToMint}
         uri={uri}
       />
       <Buy
-        contractAddressTest={contractAddressTest}
+        contractAddress={contractAddressTest}
         propertyId={propertyId}
-        propertyValueInEthereum={propertyValueInEthereum}
         tokensToBuy={tokensToBuy}
       />
       <List
-        contractAddressTest={contractAddressTest}
-        saleId={saleId}
+        contractAddress={contractAddressTest}
         propertyId={propertyId}
         tokens={tokens}
       />
       <Delist
-        contractAddressTest={contractAddressTest}
-        saleId={saleId}
+        contractAddress={contractAddressTest}
+        propertyId={propertyId}
+        amountToDeList={saleId}
+      />
+      <MintAndList
+        contractAddress={contractAddressTest}
+        propertyId={propertyId}
+        propertyValueInEthereum={propertyValueInEthereum}
+        tokensToMint={tokensToMint}
+        uri={uri}
+        tokens={tokens}
       /> */}
       <CardCarousel />
     </div>
