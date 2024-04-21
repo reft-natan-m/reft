@@ -31,6 +31,6 @@ const Home = () => {
       <FooterComp />
     </div>
   );
-};
+}
 
 export default Home;
