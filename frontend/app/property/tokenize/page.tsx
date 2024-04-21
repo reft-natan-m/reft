@@ -82,9 +82,9 @@ const Tokenize = () => {
     const postData = {
       country: formData.country,
       state: formData.state,
-      city: formData.city,
-      street1: formData.street1,
-      street2: formData.street2,
+      city: formData.city.toLowerCase(),
+      street1: formData.street1.toLowerCase(),
+      street2: formData.street2.toLowerCase(),
       zip: formData.zip,
       year: +formData.year,
       propType: formData.propType,
@@ -93,7 +93,7 @@ const Tokenize = () => {
       value: +formData.value,
       income: +formData.income,
       expense: +formData.expense,
-      tokensMinted: formData.tokens,
+      tokensMinted: +formData.tokens,
       tokenToList: +formData.tokenToList,
       userId: userSession.id,
     };
@@ -144,8 +144,7 @@ const Tokenize = () => {
       // Handle network error or other exceptions
     }
 
-    router.push("/");
-    router.refresh();
+    router.push(`/user/${userSession.id}/properties`);
   };
 
   return (

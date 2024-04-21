@@ -29,7 +29,7 @@ function Nav() {
           <NavbarToggle />
         </div>
         <NavbarCollapse className="flex-grow justify-center ml-32">
-          <NavbarLink href="/property/search">Search Properties</NavbarLink>
+          <NavbarLink href="/property/search">View Properties</NavbarLink>
         </NavbarCollapse>
       </Navbar>
     );

@@ -57,7 +57,7 @@ const TokenizeForm: React.FC<TokenizeFormProps> = ({
           id="sellnumber"
           name="tokenToList"
           type="number"
-          placeholder="amount of tokens for sale"
+          placeholder="Number of Tokens to List"
           value={formData.tokenToList}
           onChange={handleChange}
           required
