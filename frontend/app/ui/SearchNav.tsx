@@ -1,4 +1,3 @@
-"use client";
 import PaginationComp from "@/app/ui/Pagination";
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEventHandler } from "react";
@@ -15,11 +14,18 @@ const SearchNav: React.FC<SearchBarProps> = ({
   search,
 }) => {
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
     router.refresh();
     router.push("/property/search");
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    router.push(`/property/search/?page=${Number(page)}`);
   };
 
   return (
@@ -63,9 +69,11 @@ const SearchNav: React.FC<SearchBarProps> = ({
       )}
 
       {/* Center */}
-      <div className="flex-grow flex justify-center">
-        <PaginationComp totalPages={Math.ceil(totalProperties / per_Page)} />
-      </div>
+      {totalProperties > per_Page && (
+        <div className="flex-grow flex justify-center">
+          <PaginationComp totalPages={Math.ceil(totalProperties / per_Page)} />
+        </div>
+      )}
 
       {/* Right */}
       <div>

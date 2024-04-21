@@ -17,7 +17,7 @@ const config: Config = {
       colors: {
         nav: "#3b424f",
         primary: "#2B303A",
-        secondary: "#778DA9",
+        secondary: "#24222a",
         "default-text": "#E0E1DD",
         "olive-900": "#646536",
         "olive-500": "#768948",

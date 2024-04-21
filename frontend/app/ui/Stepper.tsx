@@ -8,7 +8,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep }) => {
   const stepLabels = [
     "Start",
     "Property",
-    "Ownership",
+    //"Ownership",
     "Financial",
     "Tokenization",
     "Miscellaneous",
@@ -26,7 +26,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep }) => {
                 ? "text-blue-600 dark:text-blue-500 sm:after:content-['']"
                 : " after:content-['']"
             } ${
-              index != 6
+              index != 5
                 ? "after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700"
                 : ""
             }`}

@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { userId, tokensToList, ...propertyData } = body;
+  const { userId, tokenToList, ...propertyData } = body;
 
   try {
     const user = await prisma.user.findUnique({
@@ -37,7 +37,6 @@ export async function POST(req: NextRequest) {
           propertyId: property.id,
           tokens: tokensToList,
         }),
-      });
 
       if (!response.ok) {
         return new NextResponse("Failed to list tokens for new property", {
