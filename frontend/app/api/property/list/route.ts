@@ -5,6 +5,7 @@ export async function GET() {
   try {
     const properties = await prisma.property.findMany({
       include: { tokens: true },
+      where: { tokensforSale: { gt: 0 } },
     });
 
     if (!properties) {

@@ -44,6 +44,11 @@ export async function POST(req: NextRequest) {
           status: 404,
         });
       }
+    } else {
+      await prisma.property.update({
+        where: { id: property.id },
+        data: { tokensforSale: 0 },
+      });
     }
 
     return NextResponse.json(property);
