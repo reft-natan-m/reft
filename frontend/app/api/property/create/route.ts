@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (tokensToList > 0) {
+    if (tokenToList > 0) {
       const response = await fetch("http://localhost:3000/api/listing/create", {
         method: "POST",
         headers: {
@@ -35,8 +35,9 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           userId: userId,
           propertyId: property.id,
-          tokens: tokensToList,
+          tokens: tokenToList,
         }),
+      });
 
       if (!response.ok) {
         return new NextResponse("Failed to list tokens for new property", {
