@@ -1,14 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET() {
-  try {
-    const properties = await prisma.property.findMany({
-      include: { tokens: true },
-    });
+export async function GET(request: NextRequest) {
+  const city = request.nextUrl.searchParams.get("city");
 
-    if (!properties) {
-      return new NextResponse("No properties", { status: 400 });
+  try {
+    let properties = null;
+    if (!city) {
+      properties = await prisma.property.findMany({
+        include: { tokens: true },
+        where: { tokensforSale: { gt: 0 } },
+      });
+
+      if (!properties) {
+        return new NextResponse("No properties", { status: 400 });
+      }
+    } else {
+      properties = await prisma.property.findMany({
+        include: { tokens: true },
+        where: {
+          tokensforSale: { gt: 0 },
+          city: { startsWith: city.toLowerCase() },
+        },
+      });
     }
 
     return NextResponse.json(properties);

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
+import { AlertComp } from "./AlertComp";
 
 interface FormData {
   avatar: string;
@@ -64,10 +65,11 @@ function SignupForm() {
 
     if (!res.ok) {
       const response = await res.json();
-      setErrorMessage(response.message);
+      console.log(response);
+      alert(response.error);
     } else {
       router.refresh();
-      router.push("/auth/verify-request");
+      router.push("/");
     }
   };
 

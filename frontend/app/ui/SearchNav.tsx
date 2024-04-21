@@ -1,25 +1,39 @@
-"use client";
 import PaginationComp from "@/app/ui/Pagination";
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEventHandler } from "react";
+import { UserSession } from "../api/auth/[...nextauth]/route";
 
 interface SearchBarProps {
   per_Page: number;
   totalProperties: number;
   search: boolean;
+  userSession: UserSession;
 }
 
 const SearchNav: React.FC<SearchBarProps> = ({
   per_Page,
   totalProperties,
   search,
+  userSession,
 }) => {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [refresh, setRefresh] = useState(false);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
     router.refresh();
-    router.push("/property/search");
+    if (searchQuery) {
+      router.push(`/property/search/?city=${searchQuery}`);
+    } else {
+      router.push(`/property/search/`);
+    }
+    setRefresh(!refresh);
   };
 
   return (
@@ -32,10 +46,12 @@ const SearchNav: React.FC<SearchBarProps> = ({
           </label>
           <div className="relative w-96">
             <input
-              type="search"
-              id="search"
+              type="text"
+              id="simple-search"
+              value={searchQuery}
+              onChange={handleChange}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Address, Neighborhood, City, ZIP"
+              placeholder="Enter an address, neighborhood, city, or ZIP code"
             />
             <button
               type="submit"
@@ -63,9 +79,15 @@ const SearchNav: React.FC<SearchBarProps> = ({
       )}
 
       {/* Center */}
-      <div className="flex-grow flex justify-center">
-        <PaginationComp totalPages={Math.ceil(totalProperties / per_Page)} />
-      </div>
+      {totalProperties > per_Page && (
+        <div className="flex-grow flex justify-center">
+          <PaginationComp
+            totalPages={Math.ceil(totalProperties / per_Page)}
+            search={search}
+            userSession={userSession}
+          />
+        </div>
+      )}
 
       {/* Right */}
       <div>

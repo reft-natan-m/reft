@@ -11,7 +11,7 @@ const page = () => {
     zip: `90000`,
     value: 500000,
     tokens: 100,
-    tokenForSale: 10,
+    tokenToList: 10,
     tokenPrice: 500000 / 100,
     image: "/images/Dunno.jpg",
     year: 1949,
@@ -21,9 +21,6 @@ const page = () => {
     expense: 1234,
     income: 12345,
     sizeValue: 500000 / 2100,
-    owners: "",
-    ownPercent: "",
-    entity: "",
   };
   return (
     <div className="flex justify-center items-center h-screen mt-4">

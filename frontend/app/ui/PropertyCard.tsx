@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, List } from "flowbite-react";
-import Image from "next/image";
-import { PropertyData } from "./CardData";
+import { Property, Token } from "@prisma/client";
+import { UserSession } from "../api/auth/[...nextauth]/route";
 
 interface PropertyCardProps {
-  data: PropertyData;
+  data: Property;
+  updatePropertyData?: () => void;
+  user?: boolean;
+  userSession: UserSession;
 }
 
 const formatter = new Intl.NumberFormat("en-US", {
@@ -14,28 +17,155 @@ const formatter = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
-const PropertyCard: React.FC<PropertyCardProps> = ({ data }) => {
-  //console.log(data);
+const capitalizeWords = (s: string) => {
+  return s.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const PropertyCard: React.FC<PropertyCardProps> = ({
+  data,
+  updatePropertyData,
+  userSession,
+}) => {
+  const [imageSrc, setImageSrc] = useState(`/images/${data.id}/Image0.jpg`);
+  const [listedTokensCount, setListedTokensCount] = useState(0);
+  const [unlistedTokensCount, setUnlistedTokensCount] = useState(0);
+  const [userHasTokensListed, setUserHasTokensListed] = useState(false);
+  const [userHasTokens, setUserHasTokens] = useState(false);
+
+  const handleImageError = () => {
+    // If primary image fails to load, switch to fallback image
+    setImageSrc("/images/Dunno.jpg");
+  };
+
+  const [ETH, setETH] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchETHPriceInUSD = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coinbase.com/v2/prices/ETH-USD/spot"
+        );
+        const dataETH = await response.json();
+        const ethPriceInUSD = parseFloat(dataETH.data.amount);
+        const ethAmount = data.value / data.tokensMinted / ethPriceInUSD;
+        setETH(ethAmount);
+      } catch (error) {
+        console.error("Error fetching ETH price:", error);
+        setETH(null);
+      }
+    };
+
+    fetchETHPriceInUSD();
+  }, [data, updatePropertyData]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Get user email from session
+        const userEmail = userSession.email;
+
+        // Call the API to get user data
+        const response = await fetch(`/api/user?email=${userEmail}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+
+        // Parse the JSON response
+        const userData = await response.json();
+
+        // Extract tokens from user data
+        const tokens = userData.tokens;
+
+        // Calculate number of tokens listed and unlisted
+        let listedTokens = 0;
+        let unlistedTokens = 0;
+        tokens.forEach((token: Token) => {
+          if (token.propertyId === data.id) {
+            if (token.listed) {
+              listedTokens += token.numberOfTokens;
+            } else {
+              unlistedTokens += token.numberOfTokens;
+            }
+          }
+        });
+
+        setListedTokensCount(listedTokens);
+        setUnlistedTokensCount(unlistedTokens);
+
+        // Check if the user has tokens listed for the property
+        const hasTokensListed = listedTokens > 0;
+        setUserHasTokensListed(hasTokensListed);
+
+        // Check if the user has any tokens for the property
+        const hasTokens = unlistedTokens > 0;
+        setUserHasTokens(hasTokens);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Handle error, show error message, etc.
+      }
+    };
+
+    fetchData();
+  }, [data.id]);
+
   return (
-    <div className="w-auto 2xl:w-96">
-      <Card imgAlt="Main Property Image" imgSrc={data.image}>
+    <div className="w-auto 2xl:w-96 h-full flex">
+      <Card
+        imgSrc={imageSrc}
+        imgAlt="Main image"
+        onError={handleImageError}
+        className="flex-grow"
+      >
         <h5 className="text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           {formatter.format(data.value)}
         </h5>
+        {userHasTokens ? (
+          <div>
+            <div className="flex justify-between mb-4">
+              <List horizontal>
+                <List.Item className="text-center">
+                  Listed Tokens: {data.tokensforSale}
+                </List.Item>
+                <span>|</span>
+                <List.Item className="text-center">
+                  Your Listed: {listedTokensCount}
+                </List.Item>
+              </List>
+            </div>
+            <div className="flex justify-between">
+              <List horizontal>
+                <List.Item className="text-center">
+                  Total Tokens: {data.tokensMinted}
+                </List.Item>
+                <span>|</span>
+                <List.Item className="text-center">
+                  Owned Tokens: {unlistedTokensCount + listedTokensCount}
+                </List.Item>
+              </List>
+            </div>
+          </div>
+        ) : (
+          <List horizontal>
+            <List.Item className="text-center">
+              Listed Tokens: {data.tokensforSale}
+            </List.Item>
+            <span>|</span>
+            <List.Item className="text-center">
+              Total Tokens: {data.tokensMinted}
+            </List.Item>
+          </List>
+        )}
+
         <List horizontal>
           <List.Item className="text-center">
-            Token(s) For Sale: {data.tokenForSale}
-          </List.Item>
-          <span>|</span>
-          <List.Item className="text-center">
-            Total Tokens: {data.tokens}
-          </List.Item>
-          <List.Item className="text-center">
-            Token Price: {formatter.format(data.tokenPrice)}
+            Token Price: {formatter.format(data.value / data.tokensMinted)} /{" "}
+            {ETH !== null ? ETH.toFixed(2) : "Loading..."} ETH
           </List.Item>
         </List>
         <p className="text-center font-normal text-gray-700 dark:text-gray-400">
-          {data.street1}, {data.city}, {data.state}, {data.zip}
+          {capitalizeWords(data.street1)} {capitalizeWords(data.street2)},{" "}
+          {capitalizeWords(data.city)}, {data.state}, {data.zip}
         </p>
       </Card>
     </div>
