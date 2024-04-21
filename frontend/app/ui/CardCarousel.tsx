@@ -5,8 +5,14 @@ import { Carousel } from "flowbite-react";
 import PropertyCard from "./PropertyCard";
 import ModalComp from "./ModalComp";
 import PropertyDetail from "@/app/ui/PropertyDetail";
+import { UserSession } from "../api/auth/[...nextauth]/route";
+import { useRouter } from "next/navigation";
 
-const CardCarousel: React.FC = () => {
+interface CardCarouselProps {
+  userSession: UserSession;
+}
+
+const CardCarousel: React.FC<CardCarouselProps> = ({ userSession }) => {
   const [propertyData, setPropertyData] = useState<any[]>([]);
   const [openModals, setOpenModals] = useState<boolean[][]>([]);
 
@@ -93,6 +99,7 @@ const CardCarousel: React.FC = () => {
                         <PropertyCard
                           data={data}
                           updatePropertyData={updatePropertyData}
+                          userSession={userSession}
                         />
                       </button>
                       <ModalComp
@@ -107,6 +114,7 @@ const CardCarousel: React.FC = () => {
                         <PropertyDetail
                           data={data}
                           updatePropertyData={updatePropertyData}
+                          userSession={userSession}
                         />
                       </ModalComp>
                     </div>

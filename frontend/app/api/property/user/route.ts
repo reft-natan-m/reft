@@ -5,6 +5,7 @@ import { Property } from "@prisma/client";
 export async function GET(request: NextRequest) {
   const userEmail = request.nextUrl.searchParams.get("email");
   const properties: Property[] = [];
+  const propertyIds = new Set<string>(); // Keep track of property IDs
 
   if (!userEmail) {
     return new NextResponse("No user email provided", { status: 400 });
@@ -32,12 +33,10 @@ export async function GET(request: NextRequest) {
           },
         });
 
-        if (!property) {
-          return new NextResponse("No properties found", {
-            status: 204,
-          });
+        if (property && !propertyIds.has(property.id)) {
+          properties.push(property);
+          propertyIds.add(property.id);
         }
-        properties.push(property);
       })
     );
 

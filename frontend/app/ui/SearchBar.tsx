@@ -4,11 +4,21 @@ import React, { useState, ChangeEvent, FormEventHandler } from "react";
 
 const SearchBar: React.FC = () => {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
     router.refresh();
-    router.push("/property/search");
+    if (searchQuery) {
+      router.push(`/property/search/?city=${searchQuery}`);
+    } else {
+      router.push(`/property/search/`);
+    }
   };
   return (
     <div className="relative mb-10">
@@ -35,6 +45,8 @@ const SearchBar: React.FC = () => {
                     <input
                       type="text"
                       id="simple-search"
+                      value={searchQuery}
+                      onChange={handleChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Enter an address, neighborhood, city, or ZIP code"
                     />
