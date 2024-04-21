@@ -10,14 +10,14 @@ import Delist from "./wallet/DelistToken";
 import MintAndList from "./wallet/MintAndList";
 
 //TEST DATA SCENEARIO
-const contractAddressTest = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-const uri = "www.example.com/api/property/1";
-const propertyId = 5;
-const propertyValueInEthereum = 1;
-const tokensToMint = 100;
-const tokensToBuy = 1;
-const saleId = 1;
-const tokens = 10;
+// const contractAddressTest = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+// const uri = "www.example.com/api/property/1";
+// const propertyId = 6;
+// const propertyValueInEthereum = 1;
+// const tokensToMint = 100;
+// const tokensToBuy = 1;
+// const saleId = 1;
+// const tokens = 10;
 
 const Home = () => {
   return (
@@ -29,7 +29,7 @@ const Home = () => {
       {/* <Mint
         contractAddress={contractAddressTest}
         propertyId={propertyId}
-        propertyValueInEthereum={propertyValueInEthereum}
+        pricePerTokenInEthereum={propertyValueInEthereum}
         tokensToMint={tokensToMint}
         uri={uri}
       />
@@ -51,7 +51,7 @@ const Home = () => {
       <MintAndList
         contractAddress={contractAddressTest}
         propertyId={propertyId}
-        propertyValueInEthereum={propertyValueInEthereum}
+        pricePerTokenInEthereum={propertyValueInEthereum}
         tokensToMint={tokensToMint}
         uri={uri}
         tokens={tokens}

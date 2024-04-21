@@ -8,10 +8,10 @@ import { useAccount, useBalance } from 'wagmi';
 // Extract the ABI from the loaded JSON data
 const abi = RealEstateFungibleTokenData.abi; 
 
-const MintAndList = ({ contractAddress, propertyId, propertyValueInEthereum, tokensToMint, uri, tokens }: {
+const MintAndList = ({ contractAddress, propertyId, pricePerTokenInEthereum, tokensToMint, uri, tokens }: {
   contractAddress: string,
   propertyId: number,
-  propertyValueInEthereum: number,
+  pricePerTokenInEthereum: number,
   tokensToMint: number,
   uri: string,
   tokens: number,
@@ -36,29 +36,29 @@ const MintAndList = ({ contractAddress, propertyId, propertyValueInEthereum, tok
     const reft = new Contract(contractAddress, abi, signer);
 
     // Check Signer Funds
-    const feeWei = await reft.getFee(propertyId);
+    const pricePerTokenInWei = parseEther(pricePerTokenInEthereum.toString());
+    const feeWei = pricePerTokenInWei * BigInt(tokensToMint) / BigInt(10000);
     if (feeWei > ethBalance) {
       alert('Insufficient Funds, please add funds to your wallet');
       return;
     }
 
     try {
-      const propertyValueInWei = parseEther(propertyValueInEthereum.toString());
       const result = await reft.balanceOf(signer.address, propertyId);
       console.log('Current balance:', result.toString());
 
       const mintResult = await reft.mintAndListTokenForSale(signer.address,
         propertyId,
         tokensToMint,
-        propertyValueInWei,
+        pricePerTokenInWei,
         uri,
         tokens,
-        // { value: feeWei } // Pass fee as value (in wei) to the transaction
+        { value: feeWei } // Pass fee as value (in wei) to the transaction
       )
       
       console.log('Mint transaction hash:', mintResult.hash);
       console.log(`Minting ${tokensToMint} tokens for property ${propertyId} to ${address}`);
-      console.log('List tokens result:', reft.getAllListingsForProperty(propertyId));
+      console.log('List tokens result:', await reft.getAllListingsForProperty(propertyId));
       alert('Tokens minted and listed successfully!');
     } catch (error) {
       console.error("Error minting and listing tokens:", error);

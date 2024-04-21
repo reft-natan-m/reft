@@ -8,10 +8,10 @@ import { useAccount, useBalance } from 'wagmi';
 // Extract the ABI from the loaded JSON data
 const abi = RealEstateFungibleTokenData.abi; 
 
-const Mint = ({ contractAddress, propertyId, propertyValueInEthereum, tokensToMint, uri }: {
+const Mint = ({ contractAddress, propertyId, pricePerTokenInEthereum, tokensToMint, uri }: {
   contractAddress: string,
   propertyId: number,
-  propertyValueInEthereum: number,
+  pricePerTokenInEthereum: number,
   tokensToMint: number,
   uri: string
 }) => {
@@ -43,14 +43,14 @@ const Mint = ({ contractAddress, propertyId, propertyValueInEthereum, tokensToMi
     }
 
     try {
-      const propertyValueInWei = parseEther(propertyValueInEthereum.toString());
+      const pricePerTokenInWei = parseEther(pricePerTokenInEthereum.toString());
       const result = await reft.balanceOf(signer.address, propertyId);
       console.log('Current balance:', result.toString());
 
       const mintResult = await reft.mint(signer.address,
         propertyId,
         tokensToMint,
-        propertyValueInWei,
+        pricePerTokenInWei,
         uri)
       
       console.log('Mint transaction hash:', mintResult.hash);
