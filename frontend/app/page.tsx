@@ -1,22 +1,26 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { UserSession } from "./api/auth/[...nextauth]/route";
 import CardCarousel from "./ui/CardCarousel";
+import Feature from "./ui/Features";
 import SearchBar from "./ui/SearchBar";
+import { FooterComp } from "./ui/Footer";
 
 const Home = () => {
-  // const { data: session, status } = useSession();
-
-  // console.log(session);
+  const { data: session, status } = useSession();
+  const userSession = session?.user as UserSession;
+  //console.log(userSession.id);
   // console.log(status);
 
   return (
     <div>
       <SearchBar />
-      <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:mb-6 sm:text-2xl">
-        Real Estate Near You.
-      </h3>
       <CardCarousel />
+      <div className="bg-gray-100 dark:bg-secondary">
+        <Feature userSession={userSession} />
+      </div>
+      <FooterComp />
     </div>
   );
 };

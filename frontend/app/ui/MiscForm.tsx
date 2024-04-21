@@ -41,6 +41,7 @@ const MiscForm: React.FC<MiscFormProps> = ({
   };
 
   const handleNext = () => {
+    console.log(formData);
     handleSubmit(formData);
     nextStep();
   };

@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import NextAuth from "next-auth/next";
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, Session } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { Adapter } from "next-auth/adapters";
 import prisma from "@/lib/prisma";
 
-interface UserSession {
+export interface UserSession {
   id: string;
   username: string | null;
   email: string | null;
