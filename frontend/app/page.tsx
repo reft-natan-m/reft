@@ -29,13 +29,7 @@ const Home = () => {
     <div>
       <SearchBar />
       <CardCarousel userSession={userSession} />
-      <Mint
-        contractAddress={tokenAddress}
-        pricePerTokenInEthereum={1}
-        propertyId={"66255a7bef0f49945b83aa92"}
-        tokensToMint={100}
-        uri={"/property/view/{propertyId}"}
-      />
+
       <div className="bg-gray-100 dark:bg-secondary">
         <Feature userSession={userSession} />
       </div>

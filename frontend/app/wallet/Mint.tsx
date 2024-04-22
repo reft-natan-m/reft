@@ -34,8 +34,6 @@ const Mint = ({
 
   // MINT FUNCTION
   const mintToken = async () => {
-    console.log("ETH: ", pricePerTokenInEthereum);
-
     const ethBalance = balance.data?.value;
     if (!address || !ethBalance || !signer) {
       alert("Please connect your wallet first.");
@@ -79,7 +77,7 @@ const Mint = ({
       );
 
       alert("Tokens minted successfully!");
-      router.push(`/user/properties/${userSession.id}`);
+      router.push(`/user/${userSession.id}/properties`);
     } catch (error) {
       console.error("Error minting tokens:", error);
       alert("Error minting tokens. Aborting Process.");
@@ -87,7 +85,7 @@ const Mint = ({
     }
   };
 
-  return <Button onClick={mintToken}> Mint Button </Button>;
+  return <Button onClick={mintToken}> Mint Tokens</Button>;
 };
 
 export default Mint;

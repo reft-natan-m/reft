@@ -12,6 +12,7 @@ import TokenizeEnd from "@/app/ui/TokenizeEnd";
 import { useSession } from "next-auth/react";
 import { UserSession } from "@/app/api/auth/[...nextauth]/route";
 import Mint from "@/app/wallet/Mint";
+import MintAndList from "@/app/wallet/MintAndList";
 
 interface NewFormData {
   propertyId: string;
@@ -64,6 +65,7 @@ const Tokenize = () => {
     images: null,
   });
   const [propertyId, setPropertyId] = useState<string | null>(null);
+  const [listedTokens, setListedTokens] = useState<number>(0);
   const [ETH, setETH] = useState<number | null>(null);
 
   useEffect(() => {
@@ -121,6 +123,7 @@ const Tokenize = () => {
       tokenToList: +formData.tokenToList,
       userId: userSession.id,
     };
+    setListedTokens(postData.tokenToList);
     try {
       const res = await fetch("/api/property/create", {
         method: "POST",
@@ -224,13 +227,23 @@ const Tokenize = () => {
             handleSubmitAllForms={handleSubmitAllForms}
           />
         )}
-        {currentStep === 6 && propertyId && ETH && (
+        {currentStep === 6 && listedTokens === 0 && propertyId && ETH && (
           <Mint
             contractAddress={tokenAddress}
             propertyId={propertyId}
-            pricePerTokenInEthereum={ETH} // Change this to actual price
-            tokensToMint={100} // Change this to actual number of tokens
+            pricePerTokenInEthereum={ETH}
+            tokensToMint={100}
             uri={`/property/${propertyId}`}
+          />
+        )}
+        {currentStep === 6 && listedTokens > 0 && propertyId && ETH && (
+          <MintAndList
+            contractAddress={tokenAddress}
+            propertyId={propertyId}
+            pricePerTokenInEthereum={ETH}
+            tokensToMint={100}
+            uri={`/property/${propertyId}`}
+            tokens={listedTokens}
           />
         )}
       </div>

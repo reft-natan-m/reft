@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { UserSession } from "../api/auth/[...nextauth]/route";
 import { Property } from "@prisma/client";
+import Buy from "../wallet/BuyToken";
+import List from "../wallet/ListToken";
 
 interface BuySellTokensProps {
   setOpenModal: (openModal: boolean) => void;
@@ -31,11 +33,13 @@ const BuySellTokens: React.FC<BuySellTokensProps> = ({
   updatePropertyData,
   ETH,
 }) => {
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
   const { data: session } = useSession();
   const userSession = session?.user as UserSession;
   const [numberOfTokens, setNumberOfTokens] = useState<number>(1);
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleSubmit = async () => {
     if (buttonOption) {
       const formData = {
         userId: userSession.id,
@@ -97,7 +101,21 @@ const BuySellTokens: React.FC<BuySellTokensProps> = ({
           {ETH !== null ? (ETH * numberOfTokens).toFixed(2) : "Loading..."} ETH
         </div>
         <div className="flex justify-center items-center mt-4">
-          <Button type="submit">Confirm</Button>
+          {buttonOption ? (
+            <Buy
+              contractAddress={contractAddress}
+              propertyId={data.id}
+              tokensToBuy={numberOfTokens}
+              handleSubmit={handleSubmit}
+            />
+          ) : (
+            <List
+              contractAddress={contractAddress}
+              propertyId={data.id}
+              tokens={numberOfTokens}
+              handleSubmit={handleSubmit}
+            />
+          )}
         </div>
       </form>
     </div>
