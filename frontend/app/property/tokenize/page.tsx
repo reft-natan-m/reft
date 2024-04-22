@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Stepper from "@/app/ui/Stepper";
 import TokenizeStart from "@/app/ui/TokenizeStart";
@@ -11,6 +11,7 @@ import MiscForm from "@/app/ui/MiscForm";
 import TokenizeEnd from "@/app/ui/TokenizeEnd";
 import { useSession } from "next-auth/react";
 import { UserSession } from "@/app/api/auth/[...nextauth]/route";
+import Mint from "@/app/wallet/Mint";
 
 interface NewFormData {
   propertyId: string;
@@ -40,6 +41,8 @@ const Tokenize = () => {
   const { data: session } = useSession();
   const userSession = session?.user as UserSession;
 
+  const tokenAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [formData, setFormData] = useState<FormData>({
@@ -60,6 +63,27 @@ const Tokenize = () => {
     tokenToList: 0,
     images: null,
   });
+  const [propertyId, setPropertyId] = useState<string | null>(null);
+  const [ETH, setETH] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchETHPriceInUSD = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coinbase.com/v2/prices/ETH-USD/spot"
+        );
+        const dataETH = await response.json();
+        const ethPriceInUSD = parseFloat(dataETH.data.amount);
+        const ethAmount = formData.value / formData.tokens / ethPriceInUSD;
+        setETH(ethAmount);
+      } catch (error) {
+        console.error("Error fetching ETH price:", error);
+        setETH(null);
+      }
+    };
+
+    fetchETHPriceInUSD();
+  }, [formData]);
 
   const prevStep = () => {
     setCurrentStep((prevStep) => prevStep - 1);
@@ -108,6 +132,7 @@ const Tokenize = () => {
       if (res.ok) {
         propertyData = await res.json();
         console.log("data: ", propertyData);
+        setPropertyId(propertyData.id);
         const images = formData.images;
         console.log("Images: ", images);
 
@@ -144,7 +169,7 @@ const Tokenize = () => {
       // Handle network error or other exceptions
     }
 
-    router.push(`/user/${userSession.id}/properties`);
+    nextStep();
   };
 
   return (
@@ -197,6 +222,15 @@ const Tokenize = () => {
           <TokenizeEnd
             prevStep={prevStep}
             handleSubmitAllForms={handleSubmitAllForms}
+          />
+        )}
+        {currentStep === 6 && propertyId && ETH && (
+          <Mint
+            contractAddress={tokenAddress}
+            propertyId={propertyId}
+            pricePerTokenInEthereum={ETH} // Change this to actual price
+            tokensToMint={100} // Change this to actual number of tokens
+            uri={`/property/${propertyId}`}
           />
         )}
       </div>

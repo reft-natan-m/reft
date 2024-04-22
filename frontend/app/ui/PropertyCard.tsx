@@ -105,8 +105,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         // Handle error, show error message, etc.
       }
     };
-
-    fetchData();
+    if (userSession) {
+      fetchData();
+    }
   }, [data.id]);
 
   return (

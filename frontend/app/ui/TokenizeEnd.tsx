@@ -34,13 +34,12 @@ const TokenizeEnd: React.FC<TokenizeStartProps> = ({
           </button>
         </div>
         <div className="flex justify-end">
-          <Link
+          <button
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            href="/"
             onClick={handleSubmitAllForms}
           >
-            Complete
-          </Link>
+            Finalize Tokenization
+          </button>
         </div>
       </div>
     </div>
