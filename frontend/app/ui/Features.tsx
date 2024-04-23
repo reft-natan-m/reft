@@ -1,4 +1,3 @@
-import { Button } from "flowbite-react";
 import { UserSession } from "../api/auth/[...nextauth]/route";
 import Link from "next/link";
 import FeatureCard from "./FeatureCard";

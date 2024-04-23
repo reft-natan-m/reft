@@ -1,51 +1,57 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropertyCard from "@/app/ui/PropertyCard";
 import SearchNav from "@/app/ui/SearchNav";
 import ModalComp from "@/app/ui/ModalComp";
 import PropertyDetail from "@/app/ui/PropertyDetail";
+import { useSession } from "next-auth/react";
+import { UserSession } from "@/app/api/auth/[...nextauth]/route";
+import { Button, Spinner } from "flowbite-react";
+import Link from "next/link";
 import UserSidebar from "@/app/ui/UserSidebar";
 
-interface SearchResultProps {
+interface UserPropertiesProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
+const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
+  const { data: session } = useSession();
+  const userSession = session?.user as UserSession;
+
+  const user = true;
+
   const modalHeader = "Token Details";
   const page = searchParams["page"] ? Number(searchParams["page"]) : 1;
   const per_page = searchParams["per_page"]
     ? Number(searchParams["per_page"])
     : 15;
 
-  // Generate 90 property objects for testing pagination
-  const totalProperties = 90;
-  const cardDataArray = Array.from({ length: totalProperties }, (_, index) => ({
-    id: index + 1,
-    state: "CA",
-    city: `Los Angeles ${index + 1}`,
-    street1: `${index + 1} Main St`,
-    street2: "",
-    zip: `9000${index + 1}`,
-    year: 1900 + (index + 1),
-    value: 500000 + (index + 1) * 10000,
-    tokens: 100 + index,
-    tokenToList: 10 + index,
-    tokenPrice: (500000 + (index + 1) * 10000) / (100 + index),
-    propType: "Residential",
-    propSubtype: "Single Family",
-    size: 1000 + index * 100,
-    owners: "Garry",
-    ownPercent: "100%",
-    entity: "individual",
-    income: 100 + index * 100,
-    expense: 10 + index * 10,
-    image: "/images/Dunno.jpg",
-    sizeValue: (500000 + (index + 1) * 10000) / (1000 + index * 100),
-  }));
+  const [propertyData, setPropertyData] = useState<any[]>([]);
+  const [openModals, setOpenModals] = useState<boolean[]>([]);
 
-  const [openModals, setOpenModals] = useState<boolean[]>(
-    Array(cardDataArray.length).fill(false)
-  );
+  const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (session) {
+      fetchPropertyData();
+    }
+  }, [session]);
+
+  const fetchPropertyData = () => {
+    const userEmail = userSession.email;
+    console.log(userEmail);
+    fetch(`/api/property/user?email=${userEmail}`)
+      .then((response) => response.json())
+      .then((properties) => {
+        setPropertyData(properties);
+        setOpenModals(Array(properties.length).fill(false));
+      })
+      .catch((error) => {
+        console.error("Error fetching property data:", error);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const handleOpenModal = (index: number) => {
     const newModals = [...openModals];
@@ -62,27 +68,74 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
   const start = (page - 1) * per_page;
   const end = start + per_page;
 
-  const entries = cardDataArray.slice(start, end);
+  const entries = propertyData.slice(start, end);
+
   const search = false;
 
-  return (
-    <div className="flex">
-      <SearchNav
-        search={search}
-        per_Page={per_page}
-        totalProperties={totalProperties}
-      />
-      <div className="h-96 mt-4">
-        <UserSidebar />
+  if (loading) {
+    return (
+      <div>
+        <div className="mt-4">
+          <UserSidebar />
+        </div>
+        <SearchNav
+          search={search}
+          per_Page={per_page}
+          totalProperties={0}
+          userSession={userSession}
+        />
+        <div className="flex justify-center items-center mt-24">
+          <div className="w-full items-center text-center">
+            <Spinner aria-label="Loading Spinner" size="xl" />
+            <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:text-2xl mt-4">
+              Page loading...
+            </h3>
+          </div>
+        </div>
       </div>
-      <div className="ml-10">
+    );
+  } else if (propertyData.length <= 0) {
+    return (
+      <div>
+        <div className="mt-4">
+          <UserSidebar />
+        </div>
+        <SearchNav
+          search={search}
+          per_Page={per_page}
+          totalProperties={0}
+          userSession={userSession}
+        />
+        <div className="flex justify-center mt-4 mb-24">
+          <div className="w-full">
+            <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:text-2xl">
+              You do not currently have tokens for any properties...
+            </h3>
+            <div className="flex justify-center items-center">
+              <Link href="/property/search" className="text-center">
+                <Button className="mt-10">Start Investing!</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <SearchNav
+          search={search}
+          per_Page={per_page}
+          totalProperties={propertyData.length}
+          userSession={userSession}
+        />
         <div className="flex justify-center mt-4 mb-24">
           <div className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-screen-xl mx-auto mt-8">
               {entries.map((property, index) => (
-                <div key={property.id} className="p-2 overflow-x-hidden">
+                <div key={property.id} className="p-2 overflow-x-hidden h-full">
                   <button onClick={() => handleOpenModal(index)}>
-                    <PropertyCard data={property} />
+                    <PropertyCard data={property} userSession={userSession} />
                   </button>
                   <ModalComp
                     openModal={openModals[index]}
@@ -90,7 +143,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
                     modalHeader={modalHeader}
                     modalSize="3xl"
                   >
-                    <PropertyDetail data={property} />
+                    <PropertyDetail data={property} userSession={userSession} />
                   </ModalComp>
                 </div>
               ))}
@@ -98,8 +151,8 @@ const SearchResult: React.FC<SearchResultProps> = ({ searchParams }) => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
-export default SearchResult;
+export default UserProperties;

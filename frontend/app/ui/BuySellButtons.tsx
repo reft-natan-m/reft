@@ -93,7 +93,7 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({
   const handleSell = async () => {
     setButtonOption(false);
     setOpenModal(true);
-    setModalHeader("Sell Tokens");
+    setModalHeader("List Tokens");
     try {
       // Get user email from session
       const userEmail = userSession.email;
@@ -150,7 +150,7 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({
         </div>
       </ModalComp>
       <div className="w-48 flex flex-col justify-center items-center gap-4 shadow-lg shadow-gray-900 rounded-lg">
-        {(listedTokens <= 0 || userHasTokensListed) && !userHasTokens ? (
+        {listedTokens <= 0 || userHasTokensListed ? (
           <div>
             <Button disabled onClick={handleBuy} className="w-32 mt-4 mb-4">
               Buy Tokens

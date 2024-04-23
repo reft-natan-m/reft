@@ -60,7 +60,7 @@ const UserDropdown: React.FC = () => {
           >
             <li>
               <Link
-                href={`/user/${userSession?.username}/properties`}
+                href={`/user/${userSession?.id}/properties`}
                 onClick={closeDropdown}
                 className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >
@@ -69,7 +69,7 @@ const UserDropdown: React.FC = () => {
             </li>
             <li>
               <Link
-                href={`/user/${userSession?.username}/settings/email`}
+                href={`/user/${userSession?.id}/settings/email`}
                 onClick={closeDropdown}
                 className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >

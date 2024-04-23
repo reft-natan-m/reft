@@ -69,7 +69,7 @@ function SignupForm() {
       alert(response.error);
     } else {
       router.refresh();
-      router.push("/auth/verify-request");
+      router.push("/");
     }
   };
 

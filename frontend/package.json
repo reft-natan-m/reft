@@ -19,6 +19,7 @@
     "@types/formidable": "^3.4.5",
     "bcrypt": "^5.1.1",
     "csv-parser": "^3.0.0",
+    "ethers": "^6.11.1",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.3",
     "formidable": "^3.5.1",
