@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Stepper from "@/app/ui/Stepper";
 import TokenizeStart from "@/app/ui/TokenizeStart";
@@ -11,6 +11,9 @@ import MiscForm from "@/app/ui/MiscForm";
 import TokenizeEnd from "@/app/ui/TokenizeEnd";
 import { useSession } from "next-auth/react";
 import { UserSession } from "@/app/api/auth/[...nextauth]/route";
+import Mint from "@/app/wallet/Mint";
+import MintAndList from "@/app/wallet/MintAndList";
+import { List, ListItem } from "flowbite-react";
 
 interface NewFormData {
   propertyId: string;
@@ -40,6 +43,8 @@ const Tokenize = () => {
   const { data: session } = useSession();
   const userSession = session?.user as UserSession;
 
+  const tokenAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [formData, setFormData] = useState<FormData>({
@@ -60,6 +65,28 @@ const Tokenize = () => {
     tokenToList: 0,
     images: null,
   });
+  const [propertyId, setPropertyId] = useState<string | null>(null);
+  const [listedTokens, setListedTokens] = useState<number>(0);
+  const [ETH, setETH] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchETHPriceInUSD = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coinbase.com/v2/prices/ETH-USD/spot"
+        );
+        const dataETH = await response.json();
+        const ethPriceInUSD = parseFloat(dataETH.data.amount);
+        const ethAmount = formData.value / formData.tokens / ethPriceInUSD;
+        setETH(ethAmount);
+      } catch (error) {
+        console.error("Error fetching ETH price:", error);
+        setETH(null);
+      }
+    };
+
+    fetchETHPriceInUSD();
+  }, [formData]);
 
   const prevStep = () => {
     setCurrentStep((prevStep) => prevStep - 1);
@@ -97,6 +124,7 @@ const Tokenize = () => {
       tokenToList: +formData.tokenToList,
       userId: userSession.id,
     };
+    setListedTokens(postData.tokenToList);
     try {
       const res = await fetch("/api/property/create", {
         method: "POST",
@@ -108,6 +136,7 @@ const Tokenize = () => {
       if (res.ok) {
         propertyData = await res.json();
         console.log("data: ", propertyData);
+        setPropertyId(propertyData.id);
         const images = formData.images;
         console.log("Images: ", images);
 
@@ -144,7 +173,7 @@ const Tokenize = () => {
       // Handle network error or other exceptions
     }
 
-    router.push(`/user/${userSession.id}/properties`);
+    nextStep();
   };
 
   return (
@@ -198,6 +227,60 @@ const Tokenize = () => {
             prevStep={prevStep}
             handleSubmitAllForms={handleSubmitAllForms}
           />
+        )}
+        {currentStep === 6 && listedTokens === 0 && propertyId && ETH && (
+          <Mint
+            contractAddress={tokenAddress}
+            propertyId={propertyId}
+            pricePerTokenInEthereum={ETH}
+            tokensToMint={100}
+            uri={`/property/${propertyId}`}
+          />
+        )}
+        {currentStep === 6 && listedTokens > 0 && propertyId && ETH && (
+          <div className="flex flex-col items-center">
+            <h2 className="text-xl font-medium mb-4">
+              Why mint property tokens?
+            </h2>
+            <p className="text-center font-medium text-gray-900 dark:text-white mb-4 mt-4">
+              When you mint property tokens, you're essentially converting your
+              property into a digital asset that can be traded on a blockchain.
+              Each token represents a fraction of ownership in the property,
+              allowing you to divide its value into smaller, more manageable
+              portions.
+            </p>
+
+            <List ordered>
+              <List.Item>
+                Fractional Ownership: Minting property tokens allows you to sell
+                fractions of your property, enabling multiple investors to own a
+                share of the property.
+              </List.Item>
+              <List.Item>
+                Liquidity: By tokenizing your property, you make it easier to
+                buy, sell, and trade ownership shares, thus increasing liquidity
+                in the real estate market.
+              </List.Item>
+              <List.Item>
+                Accessibility: Property tokenization opens up real estate
+                investment opportunities to a wider range of investors,
+                including those with smaller budgets who may not be able to
+                afford full property ownership.
+              </List.Item>
+            </List>
+            <div className="w-full">
+              <div className="flex justify-center items-center mt-4">
+                <MintAndList
+                  contractAddress={tokenAddress}
+                  propertyId={propertyId}
+                  pricePerTokenInEthereum={ETH}
+                  tokensToMint={100}
+                  uri={`/property/${propertyId}`}
+                  tokens={listedTokens}
+                />
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
