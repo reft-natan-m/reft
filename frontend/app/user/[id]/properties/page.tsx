@@ -6,8 +6,9 @@ import ModalComp from "@/app/ui/ModalComp";
 import PropertyDetail from "@/app/ui/PropertyDetail";
 import { useSession } from "next-auth/react";
 import { UserSession } from "@/app/api/auth/[...nextauth]/route";
-import { Spinner } from "flowbite-react";
+import { Button, Spinner } from "flowbite-react";
 import Link from "next/link";
+import UserSidebar from "@/app/ui/UserSidebar";
 
 interface UserPropertiesProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -74,6 +75,9 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
   if (loading) {
     return (
       <div>
+        <div className="mt-4">
+          <UserSidebar />
+        </div>
         <SearchNav
           search={search}
           per_Page={per_page}
@@ -93,6 +97,9 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
   } else if (propertyData.length <= 0) {
     return (
       <div>
+        <div className="mt-4">
+          <UserSidebar />
+        </div>
         <SearchNav
           search={search}
           per_Page={per_page}
@@ -104,9 +111,11 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
             <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:text-2xl">
               You do not currently have tokens for any properties...
             </h3>
-            <Link href="/property/search" className="text-center">
-              Start Investing!
-            </Link>
+            <div className="flex justify-center items-center">
+              <Link href="/property/search" className="text-center">
+                <Button className="mt-10">Start Investing!</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
