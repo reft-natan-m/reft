@@ -93,7 +93,7 @@ const BuySellButtons: React.FC<BuySellButtonsProps> = ({
   const handleSell = async () => {
     setButtonOption(false);
     setOpenModal(true);
-    setModalHeader("Sell Tokens");
+    setModalHeader("List Tokens");
     try {
       // Get user email from session
       const userEmail = userSession.email;
