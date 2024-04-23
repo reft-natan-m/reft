@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import { UserSession } from "@/app/api/auth/[...nextauth]/route";
 import Mint from "@/app/wallet/Mint";
 import MintAndList from "@/app/wallet/MintAndList";
+import { List, ListItem } from "flowbite-react";
 
 interface NewFormData {
   propertyId: string;
@@ -237,14 +238,49 @@ const Tokenize = () => {
           />
         )}
         {currentStep === 6 && listedTokens > 0 && propertyId && ETH && (
-          <MintAndList
-            contractAddress={tokenAddress}
-            propertyId={propertyId}
-            pricePerTokenInEthereum={ETH}
-            tokensToMint={100}
-            uri={`/property/${propertyId}`}
-            tokens={listedTokens}
-          />
+          <div className="flex flex-col items-center">
+            <h2 className="text-xl font-medium mb-4">
+              Why mint property tokens?
+            </h2>
+            <p className="text-center font-medium text-gray-900 dark:text-white mb-4 mt-4">
+              When you mint property tokens, you're essentially converting your
+              property into a digital asset that can be traded on a blockchain.
+              Each token represents a fraction of ownership in the property,
+              allowing you to divide its value into smaller, more manageable
+              portions.
+            </p>
+
+            <List ordered>
+              <List.Item>
+                Fractional Ownership: Minting property tokens allows you to sell
+                fractions of your property, enabling multiple investors to own a
+                share of the property.
+              </List.Item>
+              <List.Item>
+                Liquidity: By tokenizing your property, you make it easier to
+                buy, sell, and trade ownership shares, thus increasing liquidity
+                in the real estate market.
+              </List.Item>
+              <List.Item>
+                Accessibility: Property tokenization opens up real estate
+                investment opportunities to a wider range of investors,
+                including those with smaller budgets who may not be able to
+                afford full property ownership.
+              </List.Item>
+            </List>
+            <div className="w-full">
+              <div className="flex justify-center items-center mt-4">
+                <MintAndList
+                  contractAddress={tokenAddress}
+                  propertyId={propertyId}
+                  pricePerTokenInEthereum={ETH}
+                  tokensToMint={100}
+                  uri={`/property/${propertyId}`}
+                  tokens={listedTokens}
+                />
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

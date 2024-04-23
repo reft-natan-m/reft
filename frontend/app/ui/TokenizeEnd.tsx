@@ -15,14 +15,8 @@ const TokenizeEnd: React.FC<TokenizeStartProps> = ({
       <h2 className="text-xl font-medium mb-4">Congratulations!</h2>
       <p className="text-center font-medium text-gray-900 dark:text-white mb-8">
         You have successfully completed the first step in the tokenization
-        process for your property. Next your information will be processed and
-        verified. Once that is complete your property will be transformed into
-        tokens, allowing you to trade them on the blockchain.
-        <br />
-        <br />
-        The verification process may take anywhere from one to five business
-        days to complete. During this time, you will receive email updates on
-        the progress of the verification process.
+        process for your property. Once you finialize the process, you will be
+        able to mint your property tokens.
       </p>
       <div className="flex justify-between w-full">
         <div className="flex justify-start">
@@ -38,7 +32,7 @@ const TokenizeEnd: React.FC<TokenizeStartProps> = ({
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
             onClick={handleSubmitAllForms}
           >
-            Finalize Tokenization
+            Finalize
           </button>
         </div>
       </div>
