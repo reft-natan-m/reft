@@ -17,7 +17,7 @@ function UserSidebar() {
   const { data: session } = useSession();
   const userSession = session?.user as UserSession;
   return (
-    <Sidebar aria-label="User Sidebar" className="justify-start">
+    <Sidebar aria-label="User Sidebar" className="justify-start h-80">
       <Sidebar.Items>
         <Sidebar.ItemGroup>
           <Sidebar.Item

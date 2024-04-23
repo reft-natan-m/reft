@@ -13,6 +13,6 @@ class PrismaSingleton {
   }
 }
 
-let prisma = PrismaSingleton.getInstance();
+const prisma = PrismaSingleton.getInstance();
 
 export default prisma;

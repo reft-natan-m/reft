@@ -74,8 +74,8 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
 
   if (loading) {
     return (
-      <div>
-        <div className="mt-4">
+      <div className="flex justify-center mt-4">
+        <div className="">
           <UserSidebar />
         </div>
         <SearchNav
@@ -84,7 +84,7 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
           totalProperties={0}
           userSession={userSession}
         />
-        <div className="flex justify-center items-center mt-24">
+        <div className="flex-1 justify-center items-center mt-24">
           <div className="w-full items-center text-center">
             <Spinner aria-label="Loading Spinner" size="xl" />
             <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:text-2xl mt-4">
@@ -96,8 +96,8 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
     );
   } else if (propertyData.length <= 0) {
     return (
-      <div>
-        <div className="mt-4">
+      <div className="flex justify-center mt-4">
+        <div className="">
           <UserSidebar />
         </div>
         <SearchNav
@@ -106,7 +106,7 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
           totalProperties={0}
           userSession={userSession}
         />
-        <div className="flex justify-center mt-4 mb-24">
+        <div className="flex-1 justify-center mt-4 mb-24">
           <div className="w-full">
             <h3 className="text-xl font-semibold sm:text-center text-gray-900 dark:text-white sm:text-2xl">
               You do not currently have tokens for any properties...
@@ -122,14 +122,17 @@ const UserProperties: React.FC<UserPropertiesProps> = ({ searchParams }) => {
     );
   } else {
     return (
-      <div>
+      <div className="flex justify-center mt-4">
+        <div className="">
+          <UserSidebar />
+        </div>
         <SearchNav
           search={search}
           per_Page={per_page}
           totalProperties={propertyData.length}
           userSession={userSession}
         />
-        <div className="flex justify-center mt-4 mb-24">
+        <div className="flex-1 justify-center mt-4 mb-24">
           <div className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-screen-xl mx-auto mt-8">
               {entries.map((property, index) => (
