@@ -1,11 +1,25 @@
 # Real Estate Fungible Token (REFT) Platform
 
 ## Description
+
 The Real Estate Fungible Token (REFT) platform leverages blockchain technology to modernize real estate transactions, addressing challenges like illiquidity, opacity, and inefficiency in traditional markets. By tokenizing real estate assets, REFT provides a more secure, transparent, and accessible platform for real estate investment.
+
+## Screenshots
+
+![header](images/header.jpg)
+![landing-1](images/landing-1.jpg)
+![landing-2](images/landing-2.jpg)
+![landing-3](images/landing-3.jpg)
+![wallet-not-connected-header](images/wallet-not-connected-header.jpg)
+![setup-wallet](images/setup-wallet.jpg)
+![property-listing](images/property-listing.jpg)
+![buy-tokens](images/buy-tokens.jpg)
+![owned-properties](images/owned-properties.jpg)
 
 ## Installation
 
 ### Prerequisites
+
 - Node.js
 - npm (Node Package Manager)
 - MetaMask (for interacting with the Ethereum blockchain)
@@ -13,6 +27,7 @@ The Real Estate Fungible Token (REFT) platform leverages blockchain technology t
 ### Steps
 
 1. **Clone the repository:**
+
 ```bash
 git clone https://github.com/username/reft.git
 cd reft
@@ -22,14 +37,16 @@ cd reft
 ```bash
 npm install
 ```
+
 3. Set up environment variables:
 Create a .env.local file in the root directory and add the necessary API keys and configuration settings.
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
-  
+
   Navigate to http://localhost:3000 to see the application running.
 
 ## Usage
